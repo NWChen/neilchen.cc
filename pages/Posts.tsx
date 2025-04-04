@@ -1,10 +1,10 @@
 import matter from "gray-matter";
-import fs from "fs";
 import path from "path";
 import { List, ListItem, Typography } from "@mui/material";
 import React from "react";
 import { CONTENT_DIR } from "../lib/constants";
 import { GetStaticProps } from "next/types";
+import fs from "fs";
 
 export type Post = {
   slug: string;

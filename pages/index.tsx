@@ -13,6 +13,7 @@ import path, { join } from "path";
 import fs from "fs";
 import { CONTENT_DIR, ABOUT_FILE } from "../lib/constants";
 import matter from "gray-matter";
+import { marked } from "marked";
 import { GetStaticProps } from "next/types";
 
 export type Content = {
@@ -35,43 +36,23 @@ export default function Home({ content }: Content) {
             Neil Chen
           </Typography>
           <Box>
-            <Button variant="text" color="primary">
+            <Button variant="text" color="primary" href="/blog">
               Blog
             </Button>
-            <Button variant="text" color="primary">
+            <Button variant="text" color="primary" href="mailto:neilwchen@gmail.com">
               Contact
             </Button>
-            <Button variant="text" color="primary">
+            <Button variant="text" color="primary" href="https://github.com/nwchen">
               GitHub
             </Button>
-            <Button variant="text" color="primary">
+            <Button variant="text" color="primary" href="https://www.linkedin.com/in/neilwchen/">
               LinkedIn
             </Button>
           </Box>
           <Box>
-            <Typography variant="body1">
-              {content}
+            <Typography component="span" variant="body1">
+              <div dangerouslySetInnerHTML={{ __html: marked(content) }} />
             </Typography>
-            {/* <Typography variant="body1">
-              Hello, I'm Neil! I'm currently a software engineer working on{" "}
-              <a href="https://earth.google.com/web/">Earth</a> and{" "}
-              <a href="https://sustainability.google/">
-                tools for sustainability
-              </a>{" "}
-              at Google in NYC.
-            </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              Previously, I worked in{" "}
-              <a href="https://www.goldmansachs.com/what-we-do/ficc-and-equities/gset-equities">
-                Goldman Sachs' Electronic Trading
-              </a>{" "}
-              division and its Structured Products spinout{" "}
-              <a href="https://www.simonmarkets.com/simon/">SIMON</a>.
-            </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              Before that, I studied computer science at Columbia University,
-              where I also built robot hardware and software.
-            </Typography> */}
           </Box>
         </Box>
         <Box sx={{ order: { xs: -1, sm: 0 } }}>
