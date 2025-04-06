@@ -1,15 +1,11 @@
-import { FC } from "react";
 import React from "react";
 import {
   Button,
   Container,
   Box,
-  Divider,
-  List,
-  ListItem,
-  Typography,
+  Divider, Typography
 } from "@mui/material";
-import path, { join } from "path";
+import path from "path";
 import fs from "fs";
 import { CONTENT_DIR, ABOUT_FILE } from "../lib/constants";
 import matter from "gray-matter";
@@ -70,23 +66,6 @@ export default function Home({ content }: Content) {
       <Divider sx={{ my: 4 }} />
       <Box>
         <Typography variant="h2">Projects</Typography>
-        {/* <List>
-          <ListItem>
-            <Typography variant="body1">
-              Analyzing 1.5 years of diary entries
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="body1">
-              Finding the brachistochrone with JAX
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="body1">
-              Building a T-shirt shooting robot
-            </Typography>
-          </ListItem>
-        </List> */}
       </Box>
       <Divider sx={{ my: 4 }} />
       <Box>
@@ -97,11 +76,10 @@ export default function Home({ content }: Content) {
 };
 
 export const getStaticProps = (async () => {
-  console.log("enter static props");
   const file = fs.readFileSync(path.join(CONTENT_DIR, ABOUT_FILE), "utf-8");
-  const { content: markdownContent } = matter(file);
+  const { content } = matter(file);
   const props = {
-    props: { content: markdownContent }
+    props: { content }
   };
   return props;
 }) satisfies GetStaticProps<Content>;

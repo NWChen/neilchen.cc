@@ -1,10 +1,11 @@
 # Dependencies
 /node_modules
+/.next
+.next
 
 # Production build
 /build
 /dist
-.next
 
 # Logs
 logs
