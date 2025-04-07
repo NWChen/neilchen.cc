@@ -8,6 +8,7 @@ import fs from "fs";
 import { CONTENT_DIR } from "../../lib/constants";
 import matter from "gray-matter";
 import Header from "../../components/Header";
+import { PostProps, PostMetadata } from "../../lib/post";
 
 export default function Post({ metadata, content }: PostProps) {
   return (

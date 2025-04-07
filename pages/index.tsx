@@ -11,12 +11,11 @@ import { CONTENT_DIR, ABOUT_FILE } from "../lib/constants";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { GetStaticProps } from "next/types";
+import Posts from "../components/Posts";
+import { PostMetadata, PostProps, Tag } from "../lib/post";
+import { getMarkdownPosts } from '../lib/getMarkdownPosts';
 
-export type Content = {
-  content: string; 
-}
-
-export default function Home({ content }: Content) {
+export default function Home({ posts, blurb }: { posts: PostProps[], blurb: string }) {
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Box
@@ -47,7 +46,7 @@ export default function Home({ content }: Content) {
           </Box>
           <Box>
             <Typography component="span" variant="body1">
-              <div dangerouslySetInnerHTML={{ __html: marked(content) }} />
+              <div dangerouslySetInnerHTML={{ __html: marked(blurb) }} />
             </Typography>
           </Box>
         </Box>
@@ -66,20 +65,27 @@ export default function Home({ content }: Content) {
       <Divider sx={{ my: 4 }} />
       <Box>
         <Typography variant="h2">Projects</Typography>
+        <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Project)} />
       </Box>
       <Divider sx={{ my: 4 }} />
       <Box>
         <Typography variant="h2">Notes</Typography>
+        <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Note)} />
       </Box>
     </Container>
   );
 };
-
 export const getStaticProps = (async () => {
+  const posts = await getMarkdownPosts({ preview: false });
+
+  // Fetch markdown content for "About" section from filesystem.
   const file = fs.readFileSync(path.join(CONTENT_DIR, ABOUT_FILE), "utf-8");
-  const { content } = matter(file);
-  const props = {
-    props: { content }
+  const { content: blurb } = matter(file);
+
+  return {
+    props: {
+      blurb: blurb,
+      posts: posts.filter((post) => post && post.metadata)
+    },
   };
-  return props;
-}) satisfies GetStaticProps<Content>;
+}) satisfies GetStaticProps<{ blurb: string, posts: PostProps[] }>;

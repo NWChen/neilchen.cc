@@ -1,9 +1,11 @@
-enum Tag {
+import { GetStaticProps } from 'next';
+
+export enum Tag {
   Project = "project",
   Note = "note"
 }
 
-type PostMetadata = {
+export type PostMetadata = {
   title?: string;
   date?: string;
   description?: string;
@@ -12,7 +14,8 @@ type PostMetadata = {
   tag?: Tag;
 }
 
-type PostProps = {
+export type PostProps = {
   metadata: PostMetadata;
   content: string;
 };
+
