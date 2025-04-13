@@ -1,5 +1,6 @@
 ---
 title: Jessie's baked creations!
+hidden: true
 ---
 
 # Mushroom & thyme whole wheat milk bread with provolone

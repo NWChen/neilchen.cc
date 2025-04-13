@@ -4,9 +4,10 @@ import React from "react";
 export default function Posts({
   posts,
 }) {
+  const publicPosts = posts.filter((post) => !post.metadata.hidden);
   return (
     <List>
-      {posts.map((post) => (
+      {publicPosts.map((post) => (
         <ListItem key={post.metadata.slug}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             {post.metadata.date && (
