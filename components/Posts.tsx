@@ -1,7 +1,9 @@
 import { List, ListItem, Box, Typography, Link } from "@mui/material";
 import React from "react";
 
-export default function Posts({ posts }: { posts: PostProps[] }) {
+export default function Posts({
+  posts,
+}) {
   return (
     <List>
       {posts.map((post) => (

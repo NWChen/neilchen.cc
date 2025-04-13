@@ -21,7 +21,7 @@ export default function Blog({ posts }: { posts: PostProps[] }) {
 }
 
 export const getStaticProps = (async () => {
-  const posts = await getMarkdownPosts({ preview: true });
+  const posts = await getMarkdownPosts();
   return {
     props: { posts: posts.filter((post) => post.metadata?.slug != 'about') }
   }

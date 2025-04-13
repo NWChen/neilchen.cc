@@ -2,7 +2,7 @@
 title: Analyzing 1.5 years of diary entries
 slug: diary-analysis
 date: 2019-06
-description: Analyzing 1.5 years of diary entries with Python
+description: Looking for trends in 1.5 years of diary entries with Python.
 tag: project
 ---
 
@@ -31,34 +31,34 @@ I quantify the content of each diary entry by its __sentiment__: how positive or
 ### Overview
 Like most people, I usually write about myself or other people. Since we filtered out _stop words_, common but relatively meaningless tokens like `on`, `for`, etc. are omitted. Below are the top 20 words which occur most frequently in my diary, dominantly concerning topics like `thinking` and `people`.
 
-![overview1](/img/diary/overview_1.png)
+![overview1](/images/diary/overview_1.png)
 
 Most of my diary entries are under 200 words. The most significant outlier, at 3,278 words, is about distractions and a short attention span. At bottom left, I bin diary entries based on word count. At bottom right, the horizontal axis is the time domain, and each point represents 1 of my 223 diary entires (with the 3,278-word outlier on Nov 2018).
 
-![overview2](/img/diary/overview_2.png)
+![overview2](/images/diary/overview_2.png)
 
 ### Weekly trends
 I write the most on the weekends. As the week progresses, I spend more time studying/working, and consequentially less time writing. On Saturdays, I apparently unload all that's accumulated during the week.
 
-![weekly1](/img/diary/weekly_trends_1.png)
+![weekly1](/images/diary/weekly_trends_1.png)
 
 Compared to the mean, on Thursdays (my most negative day) I'm more negative by a delta of 4.7%. Sorry to everyone I hung out with on Thursdays. As expected, positive and negative sentiment are inversely related and tend to settle at a more positive mood during the weekend.
 
-![weekly2](/img/diary/weekly_trends_2.png)
+![weekly2](/images/diary/weekly_trends_2.png)
 
 The __NRC Word-Emotion Association Lexicon__ lets us look at other emotions too. As shown below, throughout the week I consistently anticipate the arrival of the weekend. Similarly, sadness achieves a maximum in the middle of the business week, then steadily declines as we approach the weekend. That seems consistent with reality:
 
-![weekly3](/img/diary/weekly_trends_3.png)
+![weekly3](/images/diary/weekly_trends_3.png)
 
 ### Long-run trends
 
 As approximate metrics of mood, the intensity of positive and negative sentiment are both normally distributed. Negative sentiment has a slightly left-skewed distribution, with a long-tail on the left. Sentiment is normalized to the length of each diary entry.
 
-![longrun1](/img/diary/long_run_2.png)
+![longrun1](/images/diary/long_run_2.png)
 
 Below I show the total sentiment (`positive sentiment - negative sentiment`) expressed in my diary. This provides a rough metric of positive (`sentiment>0`) or negative (`sentiment<0`) mood. Total sentiment takes a value between -1.0 and +1.0. Over 1.5 years my mood (as measured by positive/negative sentiment) has steadily tended towards more positive sentiment. I take the rolling mean of each sentiment score over a 1-week, 1-month, and 3-month window:
 
-![longrun2](/img/diary/long_run_1.png)
+![longrun2](/images/diary/long_run_1.png)
 
 Mood in the past 1.5 years as measured by total sentiment is fairly volatile, with standard deviation `0.298` for sentiment in the range `-1.0` to `1.0`. `95%` of diary entries have a total sentiment score that lies within 2 standard deviations of the mean sentiment (consistent with the normality of the distribution of positive and negative sentiment).
 

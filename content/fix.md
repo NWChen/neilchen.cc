@@ -2,10 +2,11 @@
 title: Overview of the FIX messaging protocol
 slug: fix
 date: 2021-09
+description: The Financial Information Exchange protocol, in minutes.
 tag: note
 ---
 
-FIX (**F**inancial **I**nformation E**x**change) is a protocol for securities-related communication. FIX specifies a presentation- and application-layer protocol: it dictates how messages can be encoded, and what their contents can be. In many use cases FIX is like the electronic version of the open outcry and post-it note passing of trading prior to electronification: it handles messaging between traders, exchanges, custodians, clearinghouses, and the other entities involved in securities markets.
+FIX (**F**inancial **I**nformation E**x**change) is a protocol for (financial) securities-related communication. FIX specifies a presentation- and application-layer protocol: it dictates how messages can be encoded, and what their contents can be. In many use cases FIX is like the electronic version of the open outcry and post-it note passing of trading prior to electronification: it handles messaging between traders, exchanges, custodians, clearinghouses, and the other entities involved in securities markets.
 
 Over 10TB of FIX data are generated daily, ranging from security definitions to orders to market data.
 
@@ -16,7 +17,9 @@ Here's an example of how people use FIX: you, a registered representative at `$I
 Your trading platform sends a FIX message to `$BROKERDEALER`:
 
 ```
-8=FIX.4.4 | 9=148 | 35=D | 34=1080 | 49=TESTBUY1 | 52=20180920-18:14:19.508 | 56=TESTSELL1 | 11=63673064027889863415=USD21=2 | 38=7000 | 40=1 | 54=1 | 55=AAPL | 60=20180920-18:14:19.492 | 10=092 |
+8=FIX.4.4 | 9=148 | 35=D | 34=1080 | 49=TESTBUY1 | 52=20180920-18:14:19.508 | 56=TESTSELL1
+| 11=63673064027889863415=USD21=2 | 38=7000 | 40=1 | 54=1 | 55=AAPL | 
+60=20180920-18:14:19.492 | 10=092 |
 ```
 
 This is a plaintext ASCII message. Your trading platform sends it over TCP/IP to a FIX server in `$BROKERDEALER`'s server farm in New Jersey. The message encodes all the relevant information about this buy order in tag-value format: a **tag** is a specific field in the FIX schema, and a **value** is whatever value your trading platform assigned to that tag. For example,

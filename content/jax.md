@@ -2,17 +2,17 @@
 title: Finding the brachistochrone with JAX
 slug: jax-brachistochrone
 date: 2023-03
-description: Using JAX to optimize the brachistochrone curve
+description: Using JAX to optimize the brachistochrone curve.
 tag: project
 ---
 
-Here's the brachistochrone problem:
+The brachistochrone problem asks:
 
 > What path yields the shortest duration for a ball to roll from A to B?
 
 The shortest path from A to B is a straight line, but it's actually not the fastest path:
 
-![](/img/jax/optimal.gif)
+![](/images/jax/optimal.gif)
 
 We can get better results by accelerating the ball down a steeper path at first, then taking a bit of a loss as the ball rolls down the more shallow latter part of the path. The optimal solution to this problem is a cycloid. Can we arrive at the optimal path numerically instead? What if we use gradient descent?
 
@@ -66,8 +66,8 @@ optimize(ys, LR=LR, N_STEPS=N_STEPS)
 
 Our solution should roughly converge on the optimal path:
 
-{{< rawhtml >}}
+<!-- {{< rawhtml >}} -->
 <video width="800" height="600" controls="controls">
-	<source src="/img/jax/brachistochrone.mp4" type="video/mp4">
+	<source src="/images/jax/brachistochrone.mp4" type="video/mp4">
 </video>
-{{< /rawhtml >}}
+<!-- {{< /rawhtml >}} -->

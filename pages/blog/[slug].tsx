@@ -1,5 +1,5 @@
 import { Container, Typography } from "@mui/material";
-import { marked } from "marked";
+import Markdown from 'react-markdown'
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps } from "next/types";
 import path from "path";
@@ -9,6 +9,7 @@ import { CONTENT_DIR } from "../../lib/constants";
 import matter from "gray-matter";
 import Header from "../../components/Header";
 import { PostProps, PostMetadata } from "../../lib/post";
+import { ImageRenderer, renderers } from "../../lib/markdown";
 
 export default function Post({ metadata, content }: PostProps) {
   return (
@@ -36,14 +37,17 @@ export default function Post({ metadata, content }: PostProps) {
           />
         )}
         <Typography component="div" variant="body1">
-          <div dangerouslySetInnerHTML={{ __html: marked(content) }} />
+          <Markdown components={{
+            img: renderers.image,
+          }}>
+            {content}
+          </Markdown>
         </Typography>
       </Container>
     </>
   );
 }
 
-// TODO clean this up
 export const getStaticPaths = (async () => {
   return {
     paths: fs.readdirSync(CONTENT_DIR).map((filename) => ({

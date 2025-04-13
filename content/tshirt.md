@@ -2,7 +2,7 @@
 title: Building a T-shirt shooting robot
 slug: t-shirt-shooting-robot
 date: 2019-06
-description: I built a T-shirt shooting robot with some scraps.
+description: Building a T-shirt shooting robot with some scraps.
 tag: project
 ---
 

@@ -76,7 +76,7 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
   );
 };
 export const getStaticProps = (async () => {
-  const posts = await getMarkdownPosts({ preview: false });
+  const posts = await getMarkdownPosts();
 
   // Fetch markdown content for "About" section from filesystem.
   const file = fs.readFileSync(path.join(CONTENT_DIR, ABOUT_FILE), "utf-8");
