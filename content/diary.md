@@ -6,7 +6,7 @@ description: Looking for trends in 1.5 years of diary entries with Python.
 tag: project
 ---
 
-I wrote 39,000+ words across 223 entries in my diary in the last 1.5 years. Could I learn more about my mood/emotions by analyzing my diary? I wrote some Python to find out. <!--more--> [(skip to results)](#results)
+I wrote 39,000+ words across 223 entries in my diary in the last 1.5 years. Could I learn more about my mood/emotions by analyzing my diary? I wrote some Python to find out. [(skip to results)](#results)
 
 ---
 
