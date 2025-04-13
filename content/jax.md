@@ -66,8 +66,4 @@ optimize(ys, LR=LR, N_STEPS=N_STEPS)
 
 Our solution should roughly converge on the optimal path:
 
-<!-- {{< rawhtml >}} -->
-<video width="800" height="600" controls="controls">
-	<source src="/images/jax/brachistochrone.mp4" type="video/mp4">
-</video>
-<!-- {{< /rawhtml >}} -->
+![JAX optimization of the brachistochrone curve](/images/jax/brachistochrone.gif)

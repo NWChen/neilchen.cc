@@ -8,4 +8,3 @@ export const renderers = {
       margin: '0 auto'
     }} {...props}/>
 }
-  // ({ node, ...props }) => <img style={{ maxWidth: '100%' }}{...props} />
