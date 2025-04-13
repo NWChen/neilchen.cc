@@ -18,6 +18,7 @@ export async function getMarkdownPosts(): Promise<PostProps[]> {
         date: rawMetadata?.date ?? null,
         description: description ?? null,
         tag: rawMetadata?.tag ?? null,
+        hidden: rawMetadata?.hidden ?? false,
         slug,
       };
 
@@ -28,6 +29,6 @@ export async function getMarkdownPosts(): Promise<PostProps[]> {
     });
 
   return posts
-    .filter((post) => post && post.metadata)
+    .filter((post) => post && post.metadata && !post.metadata.hidden)
     .sort((post) => (new Date(post.metadata?.date ?? "1970-01-01")).getTime());
 }

@@ -8,6 +8,7 @@ export type PostMetadata = {
   date?: string;
   description?: string;
   slug: string;
+  hidden?: boolean;
   image_path?: string;
   tag?: Tag;
 }

@@ -3,6 +3,7 @@ title: A REPL in Vim
 slug: vim-repl
 date: 2021-01
 description: Playing with a REPL inside vim.
+hidden: true
 tag: note
 ---
 
