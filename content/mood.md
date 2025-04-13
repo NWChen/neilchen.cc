@@ -6,7 +6,11 @@ description: I tracked my mood every day for 1 year in a spreadsheet.
 tag: project
 ---
 
-I tracked my mood every day in 2024 in a spreadsheet. At the end of every day, I recorded a number from 1 to 5, where 1 was a terrible day and 5 was the best day realistically imaginable.
+I tracked my mood every day in 2024 in a spreadsheet.
+
+![](/images/mood/sheet.png)
+
+At the end of every day, I recorded a number from 1 to 5, where 1 was a terrible day and 5 was the best day realistically imaginable.
 
 ![](/images/mood/year.png)
 
