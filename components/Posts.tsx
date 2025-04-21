@@ -5,6 +5,7 @@ export default function Posts({
   posts,
 }) {
   const publicPosts = posts.filter((post) => !post.metadata.hidden);
+  publicPosts.forEach((post) => console.log("date ", new Date(post.metadata?.date ?? "")));
   return (
     <List>
       {publicPosts.map((post) => (

@@ -9,7 +9,7 @@ import { CONTENT_DIR } from "../../lib/constants";
 import matter from "gray-matter";
 import Header from "../../components/Header";
 import { PostProps, PostMetadata } from "../../lib/post";
-import { ImageRenderer, renderers } from "../../lib/markdown";
+import { renderers } from "../../lib/markdown";
 
 export default function Post({ metadata, content }: PostProps) {
   return (
