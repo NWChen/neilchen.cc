@@ -54,6 +54,12 @@ type Arc = {
   endLng: number;
 }
 
+type Path = {
+  type: ArcType;
+  color: string;
+  path: number[][];
+}
+
 type Score = {
   latDeltaMiles: number;
   lngDeltaMiles: number;
@@ -84,28 +90,39 @@ const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) 
   return { latMiles: Math.floor(latMiles), lngMiles: Math.floor(lngMiles) };
 }
 
-// Format score
-const formatScore = (startCity: Feature, endCity: Feature, score: Score) => {
+const getScore = (startCity: Feature, endCity: Feature) => {
+  const R = 6371;
+  const toRad = (deg: number) => deg * Math.PI / 180;
+  const rLat = toRad(startCity.lat);
+  const horizDist = R * Math.abs(toRad(startCity.lng) - toRad(endCity.lng)) * Math.cos(rLat);
+  const vertDist = R * Math.abs(toRad(endCity.lat) - toRad(endCity.lat));
+  const maxHoriz = R * Math.PI * Math.cos(rLat);
+  const horizScore = Math.max(0, Math.min(1, horizDist / maxHoriz));
+  const vertScore = Math.max(0, Math.min(1, 1 - (vertDist / 500))); // Adjust 500km as max acceptable vertical diff
+  return Math.round(horizScore * vertScore * 100);
+}
+
+const formatResults = (startCity: Feature, endCity: Feature, results: Score) => {
   const TIMEOUT = 100;
-  if (!startCity || !endCity || !score) return;
+  if (!startCity || !endCity || !results) return;
 
   const absScore = {
-    latDeltaMiles: Math.abs(score.latDeltaMiles),
-    lngDeltaMiles: Math.abs(score.lngDeltaMiles),
+    latDeltaMiles: Math.abs(results.latDeltaMiles),
+    lngDeltaMiles: Math.abs(results.lngDeltaMiles),
   }
 
   return <Box>
     <Fade in timeout={TIMEOUT}>
       <Typography><b>{startCity.name}</b> is:</Typography>
-      </Fade>
+    </Fade>
     <Fade in timeout={TIMEOUT * 2}>
       <Typography>
-        {absScore.latDeltaMiles} miles <span style={{color: 'blue'}}>(north-south)</span>
+        {absScore.latDeltaMiles} miles <span style={{ color: 'red' }}>(north-south)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 3}>
       <Typography>
-        {absScore.lngDeltaMiles} miles <span style={{color: 'green'}}>(east-west)</span>
+        {absScore.lngDeltaMiles} miles <span style={{ color: 'blue' }}>(east-west)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 4}><Typography>from <b>{endCity.name}</b> (your guess).</Typography></Fade>
@@ -113,67 +130,85 @@ const formatScore = (startCity: Feature, endCity: Feature, score: Score) => {
 }
 
 // Construct ground-hugging lat/lon arc
-const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcType) => {
+const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcType): Path | undefined => {
   const NUM_POINTS = 720; // Number of points for a smooth line
 
   if (type === ArcType.VERTICAL) {
     const path = [...Array(NUM_POINTS).keys()].map(i => {
       // const longitude = -180 + (360 / NUM_POINTS) * i; // From -180 to 180
-      const longitudeDiff = Math.abs(endCity.lng - startCity.lng);
-      const longitude = startCity.lng + (endCity.lng);
-      return [startCity.lat, longitude];
+      const longitudeDiff = endCity.lng - startCity.lng;
+      const longitude = startCity.lng + (i * longitudeDiff / NUM_POINTS);
+      return [endCity.lat, longitude];
     });
-    return path;
+    return {
+      type: ArcType.VERTICAL,
+      path: path,
+      color: 'blue',
+    };
   }
 
   if (type === ArcType.HORIZONTAL) {
     const path = [...Array(NUM_POINTS).keys()].map(i => {
-      const latitude = -90 + (180 / NUM_POINTS) * i; // From -90 to 90
-      return [latitude, startCity.lat];
+      // const latitude = -90 + (180 / NUM_POINTS) * i; // From -90 to 90
+      const latitudeDiff = endCity.lat - startCity.lat;
+      const latitude = startCity.lat + (i * latitudeDiff / NUM_POINTS);
+      return [latitude, startCity.lng];
     });
-    return path;
+    return {
+      type: ArcType.HORIZONTAL,
+      path: path,
+      color: 'red',
+    };
   }
-
 }
 
-const getArcs = (startCity: Feature, endCity: Feature) => {
-  const horizontalArc: Arc = {
-    type: ArcType.HORIZONTAL,
-    color: 'green',
-    altitude: 0,
-    startLat: endCity.lat,
-    startLng: startCity.lng,
-    endLat: endCity.lat,
-    endLng: endCity.lng,
-  };
+// const getArcs = (startCity: Feature, endCity: Feature) => {
+//   const horizontalArc: Arc = {
+//     type: ArcType.HORIZONTAL,
+//     color: 'green',
+//     altitude: 0,
+//     startLat: endCity.lat,
+//     startLng: startCity.lng,
+//     endLat: endCity.lat,
+//     endLng: endCity.lng,
+//   };
 
-  const verticalArc: Arc = {
-    type: ArcType.VERTICAL,
-    color: 'blue',
-    altitude: 0,
-    startLat: startCity.lat,
-    startLng: startCity.lng,
-    endLat: endCity.lat,
-    endLng: startCity.lng,
-  };
+//   const verticalArc: Arc = {
+//     type: ArcType.VERTICAL,
+//     color: 'blue',
+//     altitude: 0,
+//     startLat: startCity.lat,
+//     startLng: startCity.lng,
+//     endLat: endCity.lat,
+//     endLng: startCity.lng,
+//   };
 
-  const hypotenuseArc: Arc = {
-    type: ArcType.HYPOTENUSE,
-    color: 'red',
-    altitude: 0,
-    startLat: startCity.lat,
-    startLng: startCity.lng,
-    endLat: endCity.lat,
-    endLng: endCity.lng,
-  };
+//   const hypotenuseArc: Arc = {
+//     type: ArcType.HYPOTENUSE,
+//     color: 'red',
+//     altitude: 0,
+//     startLat: startCity.lat,
+//     startLng: startCity.lng,
+//     endLat: endCity.lat,
+//     endLng: endCity.lng,
+//   };
 
-  return [horizontalArc, verticalArc, hypotenuseArc];
-  
-  // const graticules = [
-  //   interpolateGraticule({lng: startCity.lng}),
-  //   interpolateGraticule({lat: startCity.lat})
-  // ];
-  // return graticules;
+//   return [horizontalArc, verticalArc, hypotenuseArc];
+
+//   // const graticules = [
+//   //   interpolateGraticule(startCity, endCity, ArcType.HORIZONTAL),
+//   //   interpolateGraticule(startCity, endCity, ArcType.VERTICAL),
+//   // ];
+//   // return graticules;
+// }
+
+const getGraticules = (startCity: Feature, endCity: Feature) => {
+  const graticules = [
+    interpolateGraticule(startCity, endCity, ArcType.HORIZONTAL),
+    interpolateGraticule(startCity, endCity, ArcType.VERTICAL),
+  ];
+  console.log(graticules);
+  return graticules;
 }
 
 export default function Game() {
@@ -183,9 +218,9 @@ export default function Game() {
   const [endCity, setEndCity] = useState<Feature>();
 
   // const [arcs, setArcs] = useState<Arc[]>();
-  const [arcs, setArcs] = useState<any>();
+  const [paths, setPaths] = useState<any>();
 
-  const [score, setScore] = useState<Score>();
+  const [results, setResults] = useState<Score>();
 
   // Initialize Globe when window is ready.
   let Globe = () => null;
@@ -203,7 +238,8 @@ export default function Game() {
       setStartCity(city);
       setCurrentCity(city);
       setEndCity(undefined);
-      setArcs([]);
+      // setArcs([]);
+      setPaths([]);
     }
   }
 
@@ -212,18 +248,18 @@ export default function Game() {
       setCurrentCity(city);
       setEndCity(city);
 
-      setArcs(getArcs(startCity, city));
+      setPaths(getGraticules(startCity, city));
 
       const latLngDelta = getLatLngDelta(startCity, city);
-      setScore({
+      setResults({
         latDeltaMiles: latLngDelta.latMiles,
         lngDeltaMiles: latLngDelta.lngMiles
       });
     } else {
       setCurrentCity(startCity);
       setEndCity(undefined);
-      setScore(undefined);
-      setArcs([]);
+      setResults(undefined);
+      setPaths([]);
     }
   }
 
@@ -275,6 +311,7 @@ export default function Game() {
         <Grid size={4}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
+            <Typography variant='subtitle2'>(Bonus points if your guess is <i>further</i> in the east-west direction).</Typography>
             {cities.length > 0 && <Autocomplete
               key={startCity?.key} // Setting this key lets us clear the textinput when "Start over" is pressed
               options={cities}
@@ -303,8 +340,15 @@ export default function Game() {
             />}
           </Stack>
         </Grid>
-        <Grid size={6}>
-          {score && formatScore(startCity, endCity, score)}
+        <Grid size={3}>
+          {results && formatResults(startCity, endCity, results)}
+        </Grid>
+        <Grid size={3}>
+          {startCity && endCity &&
+            <Typography variant='h2'>
+              Your score: <b>{getScore(startCity, endCity)}%</b>
+            </Typography>
+          }
         </Grid>
         <Grid size={2} display='flex' justifyContent='flex-end'>
           <Button
@@ -334,12 +378,13 @@ export default function Game() {
             }
 
             // TODO: fix typing
-            // pathColor={(arc: Arc) => arc.color}
-            // pathsData={arcs ?? []}
-            // pathStroke={1}
-            arcColor={(arc: Arc) => arc.color}
-            arcsData={arcs ?? []}
-            arcStroke={1}
+            pathColor={(path: Path) => path.color}
+            pathsData={paths ?? []}
+            pathPoints={(path: Path) => path.path}
+            pathStroke={3}
+            // arcColor={(arc: Arc) => arc.color}
+            // arcsData={arcs ?? []}
+            // arcStroke={1}
 
             labelColor={() => LABEL_COLOR}
             labelLat={(feature: Feature) => feature.lat}
