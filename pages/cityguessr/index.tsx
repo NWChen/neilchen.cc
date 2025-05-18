@@ -94,11 +94,17 @@ const getScore = (startCity: Feature, endCity: Feature) => {
   const R = 6371;
   const toRad = (deg: number) => deg * Math.PI / 180;
   const rLat = toRad(startCity.lat);
-  const horizDist = R * Math.abs(toRad(startCity.lng) - toRad(endCity.lng)) * Math.cos(rLat);
-  const vertDist = R * Math.abs(toRad(endCity.lat) - toRad(endCity.lat));
+  const horizDist = R * Math.abs(toRad(endCity.lng) - toRad(startCity.lng)) * Math.cos(rLat);
+  const vertDist = R * Math.abs(toRad(endCity.lat) - toRad(startCity.lat));
   const maxHoriz = R * Math.PI * Math.cos(rLat);
+
+  // Score for horizontal distance (higher is better)
   const horizScore = Math.max(0, Math.min(1, horizDist / maxHoriz));
-  const vertScore = Math.max(0, Math.min(1, 1 - (vertDist / 500))); // Adjust 500km as max acceptable vertical diff
+
+  // Score for vertical distance (lower is better, so we invert and scale)
+  // We want a score closer to 1 when vertDist is close to 0.
+  const maxAcceptableVertDist = 200; // Adjust this based on your tolerance (in km)
+  const vertScore = Math.max(0, Math.min(1, 1 - (vertDist / maxAcceptableVertDist)));
   return Math.round(horizScore * vertScore * 100);
 }
 
@@ -111,22 +117,22 @@ const formatResults = (startCity: Feature, endCity: Feature, results: Score) => 
     lngDeltaMiles: Math.abs(results.lngDeltaMiles),
   }
 
-  return <Box>
+  return <Stack spacing={1}>
     <Fade in timeout={TIMEOUT}>
       <Typography><b>{startCity.name}</b> is:</Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 2}>
-      <Typography>
+      <Typography variant='h3'>
         {absScore.latDeltaMiles} miles <span style={{ color: 'red' }}>(north-south)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 3}>
-      <Typography>
+      <Typography variant='h3'>
         {absScore.lngDeltaMiles} miles <span style={{ color: 'blue' }}>(east-west)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 4}><Typography>from <b>{endCity.name}</b> (your guess).</Typography></Fade>
-  </Box>
+  </Stack>
 }
 
 // Construct ground-hugging lat/lon arc
@@ -308,7 +314,7 @@ export default function Game() {
         <Grid size={12} sx={{ paddingBottom: '12px' }}>
           <Divider />
         </Grid>
-        <Grid size={4}>
+        <Grid size={5}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
             <Typography variant='subtitle2'>(Bonus points if your guess is <i>further</i> in the east-west direction).</Typography>
@@ -340,16 +346,16 @@ export default function Game() {
             />}
           </Stack>
         </Grid>
-        <Grid size={3}>
+        <Grid size={5}>
           {results && formatResults(startCity, endCity, results)}
         </Grid>
-        <Grid size={3}>
+        {/* <Grid size={3}>
           {startCity && endCity &&
             <Typography variant='h2'>
               Your score: <b>{getScore(startCity, endCity)}%</b>
             </Typography>
           }
-        </Grid>
+        </Grid> */}
         <Grid size={2} display='flex' justifyContent='flex-end'>
           <Button
             variant='contained'
