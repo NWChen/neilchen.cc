@@ -341,7 +341,7 @@ export default function Game() {
         </Grid>
         <Grid size={3}>
           {startCity && endCity &&
-            <Fade in timeout={TIMEOUT}>
+            <Fade in timeout={TIMEOUT * 5}>
               <Box>
                 <Typography display='inline' variant='h3'>
                   Your score: <span style={{ color: scoreColor }}><b>{score}%</b></span>
