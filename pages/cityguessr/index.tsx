@@ -22,6 +22,9 @@ const LABEL_SIZE = 3;
 // Approximate radius of earth in miles
 const EARTH_RADIUS_MILES = 3958.8;
 
+// Fade-in timeout
+const TIMEOUT = 100;
+
 /**
  cat populated_places.geojson| jq '{
   features: (.features | map({
@@ -97,7 +100,9 @@ const getScore = (startCity: Feature, endCity: Feature) => {
 
   // Reward higher east-west distance
   const eastWestWeight = 1.0;
-  const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 180;
+  const eastWestScore = Math.min(
+    Math.abs(endCity.lng - startCity.lng), Math.abs(startCity.lng - endCity.lng)
+  ) / 180;
 
   // Weighted average of scores
   return Math.floor(100 *
@@ -127,7 +132,6 @@ const getBestCity = (startCity: Feature, cities: Feature[]) => {
 }
 
 const formatResults = (startCity: Feature, endCity: Feature, results: Score) => {
-  const TIMEOUT = 100;
   if (!startCity || !endCity || !results) return;
 
   const absScore = {
@@ -248,6 +252,7 @@ export default function Game() {
       .then(({ features }) => {
         // Sort cities alphabetically by name
         setCities(features
+          .filter((feature: Feature) => feature.region != 'Indeterminate') // excludes Antarctica
           .sort((a: Feature, b: Feature) => a.name.localeCompare(b.name))
 
           // Key for disambiguating in components that take a collection
@@ -336,19 +341,22 @@ export default function Game() {
         </Grid>
         <Grid size={3}>
           {startCity && endCity &&
-            <>
-              <Typography display='inline' variant='h3'>
-                Your score: <span style={{color: scoreColor}}><b>{score}%</b></span>
-              </Typography>
-              <IconButton size='small'>
-                <Tooltip title='Your score is the weighted average of latitudinal and longitudinal distance. Lower north-south distance and greater east-west distance leads to a higher score.'>
-                  <HelpIcon fontSize='small'/>
-                </Tooltip>
-              </IconButton>
-              <Typography>
-                The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
-              </Typography>
-            </>
+            <Fade in timeout={TIMEOUT}>
+              <Box>
+                <Typography display='inline' variant='h3'>
+                  Your score: <span style={{ color: scoreColor }}><b>{score}%</b></span>
+                </Typography>
+                <IconButton size='small'>
+                  <Tooltip title='Your score is the weighted average of latitudinal and longitudinal distance. Lower north-south distance and greater east-west distance leads to a higher score.'>
+                    <HelpIcon fontSize='small' />
+                  </Tooltip>
+                </IconButton>
+
+                <Typography>
+                  The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
+                </Typography>
+              </Box>
+            </Fade>
           }
         </Grid>
         <Grid size={2} display='flex' justifyContent='flex-end'>
