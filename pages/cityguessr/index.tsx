@@ -50,16 +50,6 @@ enum ArcType {
   HYPOTENUSE = 'HYPOTENUSE', // TODO there's a GIS term for this, but I forget what it is
 }
 
-type Arc = {
-  type: ArcType;
-  color: string;
-  altitude?: number;
-  startLat: number;
-  startLng: number;
-  endLat: number;
-  endLng: number;
-}
-
 type Path = {
   type: ArcType;
   color: string;
@@ -75,45 +65,70 @@ type Score = {
 const featureToAsciiStr = (feature: Feature) =>
   `${feature?.name?.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}, ${feature?.region?.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`
 
+const degToRad = (deg: number) => deg * (Math.PI / 180);
+
+const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const dLat = degToRad(lat2 - lat1);
+  const dLon = degToRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.floor(EARTH_RADIUS_MILES * c);
+}
+
 // Get lat / lng delta, in latitudinal / longitudinal miles
-const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) => {
-  if (!city1 || !city2) return { latMiles: 0, lngMiles: 0 };
+const getLatLngDelta = (startCity: Feature | undefined, endCity: Feature | undefined) => {
+  // if (!city1 || !city2) return { latMiles: 0, lngMiles: 0 };
 
-  const toRadians = (deg: number) => deg * (Math.PI / 180);
+  // const toRadians = (deg: number) => deg * (Math.PI / 180);
 
-  // lat difference in miles
-  const latDiff = city2.lat - city1.lat;
-  const avgLat = (city1.lat + city2.lat) / 2;
-  const latMiles = latDiff * (Math.PI / 180) * EARTH_RADIUS_MILES;
+  // // lat difference in miles
+  // const latDiff = city2.lat - city1.lat;
+  // const avgLat = (city1.lat + city2.lat) / 2;
+  // const latMiles = latDiff * (Math.PI / 180) * EARTH_RADIUS_MILES;
 
-  // lng difference in miles (adjusted by lat)
-  const lngDiff = city2.lng - city1.lng;
-  const lngMiles = lngDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
+  // // lng difference in miles (adjusted by lat)
+  // const lngDiff = city2.lng - city1.lng;
+  // // const lngMiles = lngDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
+  // const endCityLng = city2.lng < 0 ? city2.lng + 360 : city2.lng;
+  // const startCityLng = city1.lng < 0 ? city1.lng + 360 : city1.lng;
+  // const longitudeDiff = endCityLng - startCityLng;
+  // const lngMiles = longitudeDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
 
-  return { latMiles: Math.floor(latMiles), lngMiles: Math.floor(lngMiles) };
+  // return { latMiles: Math.floor(latMiles), lngMiles: Math.floor(lngMiles) };
+  if (!startCity || !endCity) return { latMiles: 0, lngMiles: 0 };
+  const latMiles = haversine(startCity.lat, startCity.lng, endCity.lat, startCity.lng);
+  const avgLat = (startCity.lat + endCity.lat) / 2;
+  const lngMiles = haversine(avgLat, startCity.lng, avgLat, endCity.lng);
+  return { latMiles, lngMiles };
 }
 
 const getScore = (startCity: Feature, endCity: Feature) => {
   // TODO fix bad math
 
-  // Reward lower north-south distance
-  const northSouthWeight = 3.0;
-  const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
+  const maxEastWestDiff = haversine(startCity.lat, startCity.lng, startCity.lat, (startCity.lng + 180) % 360);
 
-  // Reward higher east-west distance
-  const eastWestWeight = 1.0;
-  const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 360;
+  const eastWestScore = haversine(startCity.lat, startCity.lng, endCity.lat, endCity.lng) / maxEastWestDiff;
+  const northSouthScore = 1.0 - (Math.abs(endCity.lat - startCity.lat) / 180);
 
-  // Weighted average of scores
+  // // Reward lower north-south distance
+  const northSouthWeight = 1.0;
+  // const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
+
+  // // Reward higher east-west distance
+  const eastWestWeight = 2.0;
+  // // const eastWestScore = Math.min(Math.abs(endCity.lng - startCity.lng), Math.abs(startCity.lng - endCity.lng)) / 360;
+  // const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 360;
+
+  // // Weighted average of scores
   return Math.floor(100 *
     (northSouthWeight * northSouthScore + eastWestWeight * eastWestScore)
     / (northSouthWeight + eastWestWeight));
 }
 
 const getBestCity = (startCity: Feature, cities: Feature[]) => {
-  const targetLat = startCity.lat;
-  const targetLng = (startCity.lng + 180) % 180;
-
   let bestCity = {
     feature: {},
     score: 0
@@ -124,10 +139,12 @@ const getBestCity = (startCity: Feature, cities: Feature[]) => {
       bestCity = {
         feature: city,
         score: score
-      };
+      }; 
     }
   });
 
+  console.log(startCity.lat, startCity.lng);
+  console.log(bestCity.feature.lat, bestCity.feature.lng);
   return bestCity;
 }
 
@@ -161,28 +178,35 @@ const formatResults = (startCity: Feature, endCity: Feature, results: Score) => 
 const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcType): Path | undefined => {
   const NUM_POINTS = 720; // Number of points for a smooth line
 
-  if (type === ArcType.VERTICAL) {
+  if (type === ArcType.HORIZONTAL) {
+    // e.g. endCity -162, startCity 110
+    const endCityLng = endCity.lng < 0 ? endCity.lng + 360 : endCity.lng;
+    const startCityLng = startCity.lng < 0 ? startCity.lng + 360 : startCity.lng;
+    let longitudeDiff = endCityLng - startCityLng;
+    if (endCityLng - startCityLng > 180) {
+      longitudeDiff *= -1;
+    }
+
     const path = [...Array(NUM_POINTS).keys()].map(i => {
       // const longitude = -180 + (360 / NUM_POINTS) * i; // From -180 to 180
-      const longitudeDiff = endCity.lng - startCity.lng;
       const longitude = startCity.lng + (i * longitudeDiff / NUM_POINTS);
       return [endCity.lat, longitude];
     });
     return {
-      type: ArcType.VERTICAL,
+      type: ArcType.HORIZONTAL,
       path: path,
       color: 'blue',
     };
   }
 
-  if (type === ArcType.HORIZONTAL) {
+  if (type === ArcType.VERTICAL) {
+    const latitudeDiff = endCity.lat - startCity.lat;
     const path = [...Array(NUM_POINTS).keys()].map(i => {
-      const latitudeDiff = endCity.lat - startCity.lat;
       const latitude = startCity.lat + (i * latitudeDiff / NUM_POINTS);
       return [latitude, startCity.lng];
     });
     return {
-      type: ArcType.HORIZONTAL,
+      type: ArcType.VERTICAL,
       path: path,
       color: 'red',
     };
