@@ -92,15 +92,39 @@ const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) 
 
 const getScore = (startCity: Feature, endCity: Feature) => {
   // Reward lower north-south distance
+  const northSouthWeight = 2.0;
   const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
 
   // Reward higher east-west distance
+  const eastWestWeight = 1.0;
   const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 180;
 
-  return Math.floor(((100.0 * eastWestScore) + (100.0 * northSouthScore)) / 2);
+  // Weighted average of scores
+  return Math.floor(100 *
+    (northSouthWeight * northSouthScore + eastWestWeight * eastWestScore)
+    / (northSouthWeight + eastWestWeight));
 }
 
-// TODO: tell a closer city
+const getBestCity = (startCity: Feature, cities: Feature[]) => {
+  const targetLat = startCity.lat;
+  const targetLng = (startCity.lng + 180) % 180;
+
+  let bestCity = {
+    feature: {},
+    score: 0
+  };
+  cities.forEach((city) => {
+    const score = getScore(startCity, city);
+    if (score > bestCity.score) {
+      bestCity = {
+        feature: city,
+        score: score
+      };
+    }
+  });
+
+  return bestCity;
+}
 
 const formatResults = (startCity: Feature, endCity: Feature, results: Score) => {
   const TIMEOUT = 100;
@@ -166,7 +190,6 @@ const getGraticules = (startCity: Feature, endCity: Feature) => {
     interpolateGraticule(startCity, endCity, ArcType.HORIZONTAL),
     interpolateGraticule(startCity, endCity, ArcType.VERTICAL),
   ];
-  console.log(graticules);
   return graticules;
 }
 
@@ -249,6 +272,8 @@ export default function Game() {
   // Start the game
   useEffect(start, [cities]);
 
+  const bestCity = startCity && cities ? getBestCity(startCity, cities) : undefined;
+
   return (
     <>
       <Header />
@@ -298,9 +323,14 @@ export default function Game() {
         </Grid>
         <Grid size={3}>
           {startCity && endCity &&
-            <Typography variant='h2'>
-              Your score: <b>{getScore(startCity, endCity)}%</b>
-            </Typography>
+            <>
+              <Typography variant='h3'>
+                Your score: <b>{getScore(startCity, endCity)}%</b>
+              </Typography>
+              <Typography>
+                The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>
+              </Typography>
+            </>
           }
         </Grid>
         <Grid size={2} display='flex' justifyContent='flex-end'>
