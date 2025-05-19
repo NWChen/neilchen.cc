@@ -91,22 +91,11 @@ const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) 
 }
 
 const getScore = (startCity: Feature, endCity: Feature) => {
-  const R = 6371;
-  const toRad = (deg: number) => deg * Math.PI / 180;
-  const rLat = toRad(startCity.lat);
-  const horizDist = R * Math.abs(toRad(endCity.lng) - toRad(startCity.lng)) * Math.cos(rLat);
-  const vertDist = R * Math.abs(toRad(endCity.lat) - toRad(startCity.lat));
-  const maxHoriz = R * Math.PI * Math.cos(rLat);
+  // max score along a latitude line: 0 north-south mi away, up to the max circumference distance
 
-  // Score for horizontal distance (higher is better)
-  const horizScore = Math.max(0, Math.min(1, horizDist / maxHoriz));
-
-  // Score for vertical distance (lower is better, so we invert and scale)
-  // We want a score closer to 1 when vertDist is close to 0.
-  const maxAcceptableVertDist = 200; // Adjust this based on your tolerance (in km)
-  const vertScore = Math.max(0, Math.min(1, 1 - (vertDist / maxAcceptableVertDist)));
-  return Math.round(horizScore * vertScore * 100);
 }
+
+// TODO: tell a closer city
 
 const formatResults = (startCity: Feature, endCity: Feature, results: Score) => {
   const TIMEOUT = 100;
@@ -168,46 +157,6 @@ const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcTyp
   }
 }
 
-// const getArcs = (startCity: Feature, endCity: Feature) => {
-//   const horizontalArc: Arc = {
-//     type: ArcType.HORIZONTAL,
-//     color: 'green',
-//     altitude: 0,
-//     startLat: endCity.lat,
-//     startLng: startCity.lng,
-//     endLat: endCity.lat,
-//     endLng: endCity.lng,
-//   };
-
-//   const verticalArc: Arc = {
-//     type: ArcType.VERTICAL,
-//     color: 'blue',
-//     altitude: 0,
-//     startLat: startCity.lat,
-//     startLng: startCity.lng,
-//     endLat: endCity.lat,
-//     endLng: startCity.lng,
-//   };
-
-//   const hypotenuseArc: Arc = {
-//     type: ArcType.HYPOTENUSE,
-//     color: 'red',
-//     altitude: 0,
-//     startLat: startCity.lat,
-//     startLng: startCity.lng,
-//     endLat: endCity.lat,
-//     endLng: endCity.lng,
-//   };
-
-//   return [horizontalArc, verticalArc, hypotenuseArc];
-
-//   // const graticules = [
-//   //   interpolateGraticule(startCity, endCity, ArcType.HORIZONTAL),
-//   //   interpolateGraticule(startCity, endCity, ArcType.VERTICAL),
-//   // ];
-//   // return graticules;
-// }
-
 const getGraticules = (startCity: Feature, endCity: Feature) => {
   const graticules = [
     interpolateGraticule(startCity, endCity, ArcType.HORIZONTAL),
@@ -222,10 +171,7 @@ export default function Game() {
   const [currentCity, setCurrentCity] = useState<Feature>();
   const [startCity, setStartCity] = useState<Feature>();
   const [endCity, setEndCity] = useState<Feature>();
-
-  // const [arcs, setArcs] = useState<Arc[]>();
   const [paths, setPaths] = useState<any>();
-
   const [results, setResults] = useState<Score>();
 
   // Initialize Globe when window is ready.
@@ -244,7 +190,6 @@ export default function Game() {
       setStartCity(city);
       setCurrentCity(city);
       setEndCity(undefined);
-      // setArcs([]);
       setPaths([]);
     }
   }
@@ -305,8 +250,6 @@ export default function Game() {
       <Header />
       <Grid
         container
-        // justifyContent='center'
-        // alignItems='center'
         maxWidth='lg'
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
         sx={{ margin: '0 auto' }}
@@ -321,7 +264,7 @@ export default function Game() {
             {cities.length > 0 && <Autocomplete
               key={startCity?.key} // Setting this key lets us clear the textinput when "Start over" is pressed
               options={cities}
-              getOptionLabel={(option: Feature) => option.name}
+              getOptionLabel={(option: Feature) => `${option.name}, ${option.region}`}
               filterOptions={(options, { inputValue }) =>
                 options.filter((option: Feature) =>
                   option.name.toLowerCase().startsWith(inputValue.toLowerCase())
@@ -349,13 +292,13 @@ export default function Game() {
         <Grid size={5}>
           {results && formatResults(startCity, endCity, results)}
         </Grid>
-        {/* <Grid size={3}>
+        <Grid size={3}>
           {startCity && endCity &&
             <Typography variant='h2'>
               Your score: <b>{getScore(startCity, endCity)}%</b>
             </Typography>
           }
-        </Grid> */}
+        </Grid>
         <Grid size={2} display='flex' justifyContent='flex-end'>
           <Button
             variant='contained'
