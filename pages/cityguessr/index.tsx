@@ -19,6 +19,9 @@ const LABEL_COLOR = 'white';
 const LABEL_DOT_RADIUS = 1;
 const LABEL_SIZE = 3;
 
+// Approximate radius of earth in miles
+const EARTH_RADIUS_MILES = 3958.8;
+
 /**
  cat populated_places.geojson| jq '{
   features: (.features | map({
@@ -75,24 +78,26 @@ const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) 
 
   const toRadians = (deg: number) => deg * (Math.PI / 180);
 
-  // Approximate radius of earth in miles
-  const earthRadiusMiles = 3958.8;
-
   // lat difference in miles
   const latDiff = city2.lat - city1.lat;
   const avgLat = (city1.lat + city2.lat) / 2;
-  const latMiles = latDiff * (Math.PI / 180) * earthRadiusMiles;
+  const latMiles = latDiff * (Math.PI / 180) * EARTH_RADIUS_MILES;
 
   // lng difference in miles (adjusted by lat)
   const lngDiff = city2.lng - city1.lng;
-  const lngMiles = lngDiff * (Math.PI / 180) * earthRadiusMiles * Math.cos(toRadians(avgLat));
+  const lngMiles = lngDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
 
   return { latMiles: Math.floor(latMiles), lngMiles: Math.floor(lngMiles) };
 }
 
 const getScore = (startCity: Feature, endCity: Feature) => {
-  // max score along a latitude line: 0 north-south mi away, up to the max circumference distance
+  // Reward lower north-south distance
+  const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
 
+  // Reward higher east-west distance
+  const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 180;
+
+  return Math.floor(((100.0 * eastWestScore) + (100.0 * northSouthScore)) / 2);
 }
 
 // TODO: tell a closer city
@@ -144,7 +149,6 @@ const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcTyp
 
   if (type === ArcType.HORIZONTAL) {
     const path = [...Array(NUM_POINTS).keys()].map(i => {
-      // const latitude = -90 + (180 / NUM_POINTS) * i; // From -90 to 90
       const latitudeDiff = endCity.lat - startCity.lat;
       const latitude = startCity.lat + (i * latitudeDiff / NUM_POINTS);
       return [latitude, startCity.lng];
@@ -257,7 +261,7 @@ export default function Game() {
         <Grid size={12} sx={{ paddingBottom: '12px' }}>
           <Divider />
         </Grid>
-        <Grid size={5}>
+        <Grid size={4}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
             <Typography variant='subtitle2'>(Bonus points if your guess is <i>further</i> in the east-west direction).</Typography>
@@ -277,7 +281,7 @@ export default function Game() {
               renderOption={(props, option) => {
                 return (
                   <li {...props} key={option.key}>
-                    {option.name}
+                    {option.name}, {option.region}
                   </li>
                 );
               }}
@@ -289,7 +293,7 @@ export default function Game() {
             />}
           </Stack>
         </Grid>
-        <Grid size={5}>
+        <Grid size={3}>
           {results && formatResults(startCity, endCity, results)}
         </Grid>
         <Grid size={3}>
