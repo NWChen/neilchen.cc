@@ -377,7 +377,7 @@ export default function Game() {
                 </IconButton>
 
                 <Typography>
-                  The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
+                  Another option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
                 </Typography>
               </Box>
             </Fade>
