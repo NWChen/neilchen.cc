@@ -1,8 +1,8 @@
-import { Autocomplete, Box, Button, Container, Divider, Fade, Grid, ListItem, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Container, Divider, Fade, Grid, IconButton, ListItem, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import React, { useRef, useEffect, useState } from "react";
 import Globe, { GlobeMethods } from "react-globe.gl";
 import Header from "../../components/Header";
-import { start } from "repl";
+import HelpIcon from '@mui/icons-material/Help';
 
 const getRandomElement = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -272,7 +272,20 @@ export default function Game() {
   // Start the game
   useEffect(start, [cities]);
 
-  const bestCity = startCity && cities ? getBestCity(startCity, cities) : undefined;
+  var bestCity = startCity && cities ? getBestCity(startCity, cities) : undefined;
+  if (bestCity) {
+    const bestLatLngDiff = getLatLngDelta(startCity, bestCity.feature as Feature);
+    bestCity = {
+      ...bestCity,
+      latDiff: Math.abs(bestLatLngDiff.latMiles),
+      lngDiff: Math.abs(bestLatLngDiff.lngMiles),
+    }
+  }
+
+  const score = startCity && endCity ? getScore(startCity, endCity) : undefined;
+  let scoreColor = '#922b21'; // kind of red
+  if (score && score > 80) scoreColor = '#239b56'; // kind of green
+  if (score && score > 50 && score <= 80) scoreColor = '#d4ac0d'; // kind of yellow
 
   return (
     <>
@@ -324,11 +337,16 @@ export default function Game() {
         <Grid size={3}>
           {startCity && endCity &&
             <>
-              <Typography variant='h3'>
-                Your score: <b>{getScore(startCity, endCity)}%</b>
+              <Typography display='inline' variant='h3'>
+                Your score: <span style={{color: scoreColor}}><b>{score}%</b></span>
               </Typography>
+              <IconButton size='small'>
+                <Tooltip title='Your score is the weighted average of latitudinal and longitudinal distance. Lower north-south distance and greater east-west distance leads to a higher score.'>
+                  <HelpIcon fontSize='small'/>
+                </Tooltip>
+              </IconButton>
               <Typography>
-                The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>
+                The best option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
               </Typography>
             </>
           }
