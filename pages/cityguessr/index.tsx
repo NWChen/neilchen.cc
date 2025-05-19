@@ -94,15 +94,15 @@ const getLatLngDelta = (city1: Feature | undefined, city2: Feature | undefined) 
 }
 
 const getScore = (startCity: Feature, endCity: Feature) => {
+  // TODO fix bad math
+
   // Reward lower north-south distance
-  const northSouthWeight = 2.0;
+  const northSouthWeight = 3.0;
   const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
 
   // Reward higher east-west distance
   const eastWestWeight = 1.0;
-  const eastWestScore = Math.min(
-    Math.abs(endCity.lng - startCity.lng), Math.abs(startCity.lng - endCity.lng)
-  ) / 180;
+  const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 360;
 
   // Weighted average of scores
   return Math.floor(100 *
