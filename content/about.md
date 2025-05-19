@@ -1,4 +1,4 @@
-Hello, I'm Neil! I'm currently a software engineer working on [Earth](https://earth.google.com/web/) and [tools for sustainability](https://sustainability.google/) at Google in NYC.
+Hello, I'm Neil! I'm currently a software engineer working on [software for](https://earth.google.com/web/) [sustainability](https://sustainability.google/) at Google in NYC.
 
 Previously, I worked in [Gοldman Sаϲhs' Electroniϲ Trading](https://www.goldmansachs.com/what-we-do/ficc-and-equities/gset-equities) division and its Structured Products spinout [SIMON](https://www.simonmarkets.com/simon/).
 
