@@ -208,6 +208,7 @@ export default function Game() {
   const [currentCity, setCurrentCity] = useState<Feature>();
   const [startCity, setStartCity] = useState<Feature>();
   const [endCity, setEndCity] = useState<Feature>();
+  const [bestCity, setBestCity] = useState<any>();
   const [paths, setPaths] = useState<any>();
   const [results, setResults] = useState<Score>();
 
@@ -283,20 +284,25 @@ export default function Game() {
   // Start the game
   useEffect(start, [cities]);
 
-  var bestCity = startCity && cities ? getBestCity(startCity, cities) : undefined;
-  if (bestCity) {
-    const bestLatLngDiff = getLatLngDelta(startCity, bestCity.feature as Feature);
-    bestCity = {
-      ...bestCity,
-      latDiff: Math.abs(bestLatLngDiff.latMiles),
-      lngDiff: Math.abs(bestLatLngDiff.lngMiles),
+  useEffect(() => {
+    var candidate = startCity && cities ? getBestCity(startCity, cities) : undefined;
+    if (candidate) {
+      const bestLatLngDiff = getLatLngDelta(startCity, candidate.feature as Feature);
+      candidate = {
+        ...candidate,
+        latDiff: Math.abs(bestLatLngDiff.latMiles),
+        lngDiff: Math.abs(bestLatLngDiff.lngMiles),
+      }
     }
-  }
+    setBestCity(candidate);
+  }, [startCity, endCity, cities]);
 
   const score = startCity && endCity ? getScore(startCity, endCity) : undefined;
   let scoreColor = '#922b21'; // kind of red
   if (score && score > 80) scoreColor = '#239b56'; // kind of green
   if (score && score > 50 && score <= 80) scoreColor = '#d4ac0d'; // kind of yellow
+
+  console.log(bestCity);
 
   return (
     <>
@@ -359,7 +365,7 @@ export default function Game() {
                 </IconButton>
 
                 <Typography>
-                  Another option would have been <b>{bestCity?.feature.name}, {bestCity?.feature.region}</b>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
+                  Another option would have been <span style={{ color: 'green' }}><b>{bestCity?.feature.name}, {bestCity?.feature.region}</b></span>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
                 </Typography>
               </Box>
             </Fade>
@@ -383,6 +389,8 @@ export default function Game() {
             width={CONTAINER_WIDTH}
             height={CONTAINER_HEIGHT}
             backgroundColor={CONTAINER_BACKGROUND_COLOR}
+
+            // TODO: hard mode, dont show image tiles until answer
             globeImageUrl='https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'
             globeOffset={[0, -100]}
             onGlobeReady={() =>
@@ -391,6 +399,18 @@ export default function Game() {
                 currentCity.lng
               )
             }
+
+            // ringsData={[bestCity]}
+            // ringLabel={(bc) => bc.feature.name}
+            // ringLat={(bc) => bc.feature.lat}
+            // ringLng={(bc) => bc.feature.lng}
+            // ringMaxRadius={4}
+            pointsData={startCity && endCity && bestCity ? [bestCity] : []}
+            pointLat={(bc) => bc.feature.lat}
+            pointLng={(bc) => bc.feature.lng}
+            pointColor={() => 'green'}
+            pointAltitude={0.25}
+
             pathColor={(path: Path) => path.color}
             pathsData={paths ?? []}
             pathPoints={(path: Path) => path.path}
