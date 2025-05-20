@@ -103,7 +103,7 @@ const getScore = (startCity: Feature, endCity: Feature) => {
   const longitudeScore = longitudeDifference / 180;
 
   // Evaluate final score
-  const latitudeWeight = 2.0;
+  const latitudeWeight = 4.0;
   const longitudeWeight = 1.0;
   const combinedScore = (latitudeScore * latitudeWeight + longitudeScore * longitudeWeight) / (latitudeWeight + longitudeWeight);
   return Math.floor(combinedScore * 100);
