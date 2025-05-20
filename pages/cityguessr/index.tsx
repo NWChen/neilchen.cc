@@ -391,16 +391,10 @@ export default function Game() {
                 currentCity.lng
               )
             }
-
-            // TODO: fix typing
             pathColor={(path: Path) => path.color}
             pathsData={paths ?? []}
             pathPoints={(path: Path) => path.path}
             pathStroke={3}
-            // arcColor={(arc: Arc) => arc.color}
-            // arcsData={arcs ?? []}
-            // arcStroke={1}
-
             labelColor={() => LABEL_COLOR}
             labelLat={(feature: Feature) => feature.lat}
             labelLng={(feature: Feature) => feature.lng}
