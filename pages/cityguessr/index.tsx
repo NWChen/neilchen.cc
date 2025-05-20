@@ -320,7 +320,7 @@ export default function Game() {
               getOptionLabel={(option: Feature) => `${option.name}, ${option.region}`}
               filterOptions={(options, { inputValue }) =>
                 options.filter((option: Feature) =>
-                  option.name.toLowerCase().startsWith(inputValue.toLowerCase())
+                  option.name.toLowerCase().includes(inputValue.toLowerCase())
                 )
               }
               sx={{
