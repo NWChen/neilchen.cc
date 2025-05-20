@@ -1,4 +1,4 @@
-Hello, I'm Neil! I'm currently working on [software for sustainability](https://sustainability.google.com) in NYC.
+Hello, I'm Neil! I'm currently working on [software for sustainability](https://sustainability.google/) in NYC.
 
 Previously, I worked in [Gοldman Sаϲhs' Electroniϲ Trading](https://www.goldmansachs.com/what-we-do/ficc-and-equities/gset-equities) division and its Structured Products spinout [SIMON](https://www.simonmarkets.com/simon/).
 
