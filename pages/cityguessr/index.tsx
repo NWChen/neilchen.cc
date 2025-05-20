@@ -11,8 +11,8 @@ const FLYTO_TRANSITION_MS = 0;
 
 // Container constants
 const CONTAINER_BACKGROUND_COLOR = 'white';
-const CONTAINER_WIDTH = '60%';
-const CONTAINER_HEIGHT = '60%';
+const CONTAINER_WIDTH = '50%';
+const CONTAINER_HEIGHT = '50%';
 
 // Label constants
 const LABEL_COLOR = 'white';
@@ -306,16 +306,16 @@ export default function Game() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <Grid
         container
         maxWidth='lg'
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{ margin: '0 auto' }}
+        sx={{ margin: '0 auto', p: '12px' }}
       >
-        <Grid size={12} sx={{ paddingBottom: '12px' }}>
+        {/* <Grid size={12} sx={{ paddingBottom: '12px' }}>
           <Divider />
-        </Grid>
+        </Grid> */}
         <Grid size={4}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
@@ -365,7 +365,21 @@ export default function Game() {
                 </IconButton>
 
                 <Typography>
-                  Another option would have been <span style={{ color: 'green' }}><b>{bestCity?.feature.name}, {bestCity?.feature.region}</b></span>, which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
+                  Another option would have been
+                  <Button variant='text' color='success' onClick={() => setCurrentCity(bestCity.feature)}
+                    sx={{
+                      padding: 0,
+                      minWidth: 'unset',
+                      textTransform: 'none',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    <Typography><b>{bestCity?.feature.name}, {bestCity?.feature.region}</b></Typography>
+                  </Button>,
+                  which is {bestCity.latDiff} (north-south) / {bestCity.lngDiff} (east-west) miles away
                 </Typography>
               </Box>
             </Fade>
@@ -404,12 +418,11 @@ export default function Game() {
             // ringLabel={(bc) => bc.feature.name}
             // ringLat={(bc) => bc.feature.lat}
             // ringLng={(bc) => bc.feature.lng}
-            // ringMaxRadius={4}
-            pointsData={startCity && endCity && bestCity ? [bestCity] : []}
-            pointLat={(bc) => bc.feature.lat}
-            pointLng={(bc) => bc.feature.lng}
-            pointColor={() => 'green'}
-            pointAltitude={0.25}
+            ringsData={startCity && endCity && bestCity ? [bestCity] : []}
+            ringLat={(bc) => bc.feature.lat}
+            ringLng={(bc) => bc.feature.lng}
+            ringColor={() => 'orange'}
+            ringMaxRadius={4}
 
             pathColor={(path: Path) => path.color}
             pathsData={paths ?? []}
