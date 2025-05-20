@@ -22,6 +22,9 @@ const LABEL_SIZE = 3;
 // Approximate radius of earth in miles
 const EARTH_RADIUS_MILES = 3958.8;
 
+// Best city constants
+const MAX_NORTH_SOUTH_DIFF_DEG = 15;
+
 // Fade-in timeout
 const TIMEOUT = 100;
 
@@ -80,24 +83,6 @@ const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
 
 // Get lat / lng delta, in latitudinal / longitudinal miles
 const getLatLngDelta = (startCity: Feature | undefined, endCity: Feature | undefined) => {
-  // if (!city1 || !city2) return { latMiles: 0, lngMiles: 0 };
-
-  // const toRadians = (deg: number) => deg * (Math.PI / 180);
-
-  // // lat difference in miles
-  // const latDiff = city2.lat - city1.lat;
-  // const avgLat = (city1.lat + city2.lat) / 2;
-  // const latMiles = latDiff * (Math.PI / 180) * EARTH_RADIUS_MILES;
-
-  // // lng difference in miles (adjusted by lat)
-  // const lngDiff = city2.lng - city1.lng;
-  // // const lngMiles = lngDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
-  // const endCityLng = city2.lng < 0 ? city2.lng + 360 : city2.lng;
-  // const startCityLng = city1.lng < 0 ? city1.lng + 360 : city1.lng;
-  // const longitudeDiff = endCityLng - startCityLng;
-  // const lngMiles = longitudeDiff * (Math.PI / 180) * EARTH_RADIUS_MILES * Math.cos(toRadians(avgLat));
-
-  // return { latMiles: Math.floor(latMiles), lngMiles: Math.floor(lngMiles) };
   if (!startCity || !endCity) return { latMiles: 0, lngMiles: 0 };
   const latMiles = haversine(startCity.lat, startCity.lng, endCity.lat, startCity.lng);
   const avgLat = (startCity.lat + endCity.lat) / 2;
@@ -106,26 +91,22 @@ const getLatLngDelta = (startCity: Feature | undefined, endCity: Feature | undef
 }
 
 const getScore = (startCity: Feature, endCity: Feature) => {
-  // TODO fix bad math
+  // Normalize latitude difference to a 0-1 range (0 being best)
+  const latitudeDifference = Math.abs(startCity.lat - endCity.lat);
+  const latitudeScore = 1 - (latitudeDifference / 180);
 
-  const maxEastWestDiff = haversine(startCity.lat, startCity.lng, startCity.lat, (startCity.lng + 180) % 360);
+  // Calculate the shortest longitude difference (0 being worst, 180 being best)
+  let longitudeDifference = Math.abs(startCity.lng - endCity.lng);
+  if (longitudeDifference > 180) {
+    longitudeDifference = 360 - longitudeDifference;
+  }
+  const longitudeScore = longitudeDifference / 180;
 
-  const eastWestScore = haversine(startCity.lat, startCity.lng, endCity.lat, endCity.lng) / maxEastWestDiff;
-  const northSouthScore = 1.0 - (Math.abs(endCity.lat - startCity.lat) / 180);
-
-  // // Reward lower north-south distance
-  const northSouthWeight = 1.0;
-  // const northSouthScore = (180 - Math.abs(endCity.lat - startCity.lat)) / 180;
-
-  // // Reward higher east-west distance
-  const eastWestWeight = 2.0;
-  // // const eastWestScore = Math.min(Math.abs(endCity.lng - startCity.lng), Math.abs(startCity.lng - endCity.lng)) / 360;
-  // const eastWestScore = Math.abs(endCity.lng - startCity.lng) / 360;
-
-  // // Weighted average of scores
-  return Math.floor(100 *
-    (northSouthWeight * northSouthScore + eastWestWeight * eastWestScore)
-    / (northSouthWeight + eastWestWeight));
+  // Evaluate final score
+  const latitudeWeight = 2.0;
+  const longitudeWeight = 1.0;
+  const combinedScore = (latitudeScore * latitudeWeight + longitudeScore * longitudeWeight) / (latitudeWeight + longitudeWeight);
+  return Math.floor(combinedScore * 100);
 }
 
 const getBestCity = (startCity: Feature, cities: Feature[]) => {
@@ -135,16 +116,14 @@ const getBestCity = (startCity: Feature, cities: Feature[]) => {
   };
   cities.forEach((city) => {
     const score = getScore(startCity, city);
-    if (score > bestCity.score) {
+    if (score > bestCity.score && Math.abs(city.lat - startCity.lat) < MAX_NORTH_SOUTH_DIFF_DEG) {
       bestCity = {
         feature: city,
         score: score
-      }; 
+      };
     }
   });
 
-  console.log(startCity.lat, startCity.lng);
-  console.log(bestCity.feature.lat, bestCity.feature.lng);
   return bestCity;
 }
 
@@ -179,16 +158,19 @@ const interpolateGraticule = (startCity: Feature, endCity: Feature, type: ArcTyp
   const NUM_POINTS = 720; // Number of points for a smooth line
 
   if (type === ArcType.HORIZONTAL) {
-    // e.g. endCity -162, startCity 110
-    const endCityLng = endCity.lng < 0 ? endCity.lng + 360 : endCity.lng;
-    const startCityLng = startCity.lng < 0 ? startCity.lng + 360 : startCity.lng;
+    const endCityLng = endCity.lng;
+    const startCityLng = startCity.lng;
+    // Calculate the raw difference in longitudes
     let longitudeDiff = endCityLng - startCityLng;
-    if (endCityLng - startCityLng > 180) {
-      longitudeDiff *= -1;
+
+    // Adjust the difference if it's greater than 180 degrees (or less than -180)
+    if (longitudeDiff > 180) {
+      longitudeDiff -= 360;
+    } else if (longitudeDiff < -180) {
+      longitudeDiff += 360;
     }
 
     const path = [...Array(NUM_POINTS).keys()].map(i => {
-      // const longitude = -180 + (360 / NUM_POINTS) * i; // From -180 to 180
       const longitude = startCity.lng + (i * longitudeDiff / NUM_POINTS);
       return [endCity.lat, longitude];
     });
