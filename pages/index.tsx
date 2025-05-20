@@ -40,8 +40,8 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
             <Button variant="text" color="primary" href="https://github.com/nwchen">
               GitHub
             </Button>
-            <Button variant="text" color="primary" href="https://www.linkedin.com/in/neilwchen/">
-              LinkedIn
+            <Button variant="text" color="primary" href="https://www.strava.com/athletes/66448483">
+              Strava 
             </Button>
           </Box>
           <Box>
