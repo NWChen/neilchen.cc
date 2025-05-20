@@ -16,8 +16,6 @@ import { PostMetadata, PostProps, Tag } from "../lib/post";
 import { getMarkdownPosts } from '../lib/getMarkdownPosts';
 
 export default function Home({ posts, blurb }: { posts: PostProps[], blurb: string }) {
-  // TODO: support non-blog-posts in projects
-
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Box

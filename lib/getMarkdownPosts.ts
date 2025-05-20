@@ -19,6 +19,7 @@ export async function getMarkdownPosts(): Promise<PostProps[]> {
         description: description ?? null,
         tag: rawMetadata?.tag ?? null,
         hidden: rawMetadata?.hidden ?? false,
+        redirect_uri: rawMetadata?.redirectUri ?? null,
         slug,
       };
 

@@ -3,15 +3,24 @@ import Markdown from 'react-markdown'
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps } from "next/types";
 import path from "path";
-import React from "react";
+import React, { useEffect } from "react";
 import fs from "fs";
 import { CONTENT_DIR } from "../../lib/constants";
 import matter from "gray-matter";
 import Header from "../../components/Header";
 import { PostProps, PostMetadata } from "../../lib/post";
 import { renderers } from "../../lib/markdown";
+import { useRouter } from 'next/navigation';
 
 export default function Post({ metadata, content }: PostProps) {
+  const { push } = useRouter();
+  if (metadata.redirect_uri) {
+    useEffect(() => {
+       push(metadata.redirect_uri!);
+    }, []);
+    return;
+  }
+
   return (
     <>
       <Head>

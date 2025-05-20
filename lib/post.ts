@@ -10,6 +10,7 @@ export type PostMetadata = {
   slug: string;
   hidden?: boolean;
   image_path?: string;
+  redirect_uri?: string;
   tag?: Tag;
 }
 
