@@ -302,11 +302,9 @@ export default function Game() {
   if (score && score > 80) scoreColor = '#239b56'; // kind of green
   if (score && score > 50 && score <= 80) scoreColor = '#d4ac0d'; // kind of yellow
 
-  console.log(bestCity);
-
   return (
     <>
-      {/* <Header /> */}
+      <Header />
       <Grid
         container
         maxWidth='lg'
