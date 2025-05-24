@@ -309,11 +309,11 @@ export default function Game() {
         container
         maxWidth='lg'
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{ margin: '0 auto', p: '12px' }}
+        sx={{ margin: '0 auto' }}
       >
-        {/* <Grid size={12} sx={{ paddingBottom: '12px' }}>
+        <Grid size={12} sx={{ paddingBottom: '24px' }}>
           <Divider />
-        </Grid> */}
+        </Grid>
         <Grid size={4}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
