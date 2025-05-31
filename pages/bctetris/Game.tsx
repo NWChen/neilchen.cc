@@ -82,7 +82,7 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
   // take the baord-centric view of a tetromino (give absolute board position)
   const commitTetrominoToBoard = () => {
     // assumes current tetromino is within board bounds. otherwise runtime errors
-    const cellOffsets = getTetrominoPositions(state.currentTetromino.type);
+    const cellOffsets = getTetrominoPositions(state.currentTetromino);
     cellOffsets.forEach((offset: Position) => {
       const boardX = state.currentTetromino.position.x + offset.x;
       const boardY = state.currentTetromino.position.y + offset.y;
@@ -103,7 +103,7 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
   // collides and can move no further
   const collides = (x: number, y: number) => {
     // getTetrominoPositions(state.currentTetromino.type).forEach((offset) => {
-    const positions = getTetrominoPositions(state.currentTetromino.type);
+    const positions = getTetrominoPositions(state.currentTetromino);
     for (let i = 0; i < positions.length; ++i) {
       const offset: Position = positions[i];
       const boardX = x + offset.x;
@@ -147,8 +147,7 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
       }
       break;
     case InputKey.ArrowUp:
-      // ++state.currentTetromino.position.y;
-      // TODO handle rotation
+      state.currentTetromino.rotation = (state.currentTetromino.rotation + 1) % 4;
       break;
     case InputKey.Space:
       console.log("handling space key");
@@ -176,58 +175,59 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
 }
 
 // TODO move this out
-const getTetrominoPositions = (type: TetrominoType): Position[] => {
-  switch (type) {
-    case 'I':
-      return [
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-        { x: 2, y: 1 },
-        { x: 3, y: 1 }
-      ];
-    case 'J':
-      return [
-        { x: 1, y: 0 },
-        { x: 1, y: 1 },
-        { x: 1, y: 2 },
-        { x: 0, y: 2 }
-      ];
-    case 'L':
-      return [
-        { x: 1, y: 0 },
-        { x: 1, y: 1 },
-        { x: 1, y: 2 },
-        { x: 2, y: 2 }
-      ];
-    case 'O':
-      return [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 }
-      ];
-    case 'S':
-      return [
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 }
-      ];
-    case 'T':
-      return [
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-        { x: 2, y: 1 }
-      ];
-    case 'Z':
-      return [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 },
-        { x: 1, y: 1 },
-        { x: 2, y: 1 }
-      ];
+// const getTetrominoPositions = (type: TetrominoType, rotation: number): Position[] => {
+const getTetrominoPositions = (tetromino: Tetromino): Position[] => {
+  const positions = {
+    'T': {
+      0: [[0, 1], [1, 0], [1, 1], [1, 2]],
+      1: [[0, 1], [1, 0], [1, 1], [2, 1]],
+      2: [[1, 0], [1, 1], [1, 2], [2, 1]],
+      3: [[0, 1], [1, 1], [1, 2], [2, 1]],
+    },
+    'I': {
+      0: [[0, 0], [0, 1], [0, 2], [0, 3]],
+      1: [[0, 2], [1, 2], [2, 2], [3, 2]],
+      2: [[0, 0], [0, 1], [0, 2], [0, 3]],
+      3: [[0, 2], [1, 2], [2, 2], [3, 2]],
+    },
+    'L': {
+      0: [[0, 1], [1, 1], [2, 1], [2, 2]],
+      1: [[0, 0], [1, 0], [1, 1], [1, 2]],
+      2: [[0, 0], [0, 1], [1, 1], [2, 1]],
+      3: [[1, 0], [1, 1], [1, 2], [2, 2]],
+    },
+    'J': {
+      0: [[0, 1], [1, 1], [2, 1], [2, 0]],
+      1: [[0, 0], [1, 0], [1, 1], [1, 2]],
+      2: [[0, 1], [0, 2], [1, 1], [2, 1]],
+      3: [[1, 0], [1, 1], [1, 2], [0, 2]],
+    },
+    'O': {
+      0: [[0, 0], [0, 1], [1, 0], [1, 1]],
+      1: [[0, 0], [0, 1], [1, 0], [1, 1]],
+      2: [[0, 0], [0, 1], [1, 0], [1, 1]],
+      3: [[0, 0], [0, 1], [1, 0], [1, 1]],
+    },
+    'S': {
+      0: [[0, 1], [0, 2], [1, 0], [1, 1]],
+      1: [[0, 0], [1, 0], [1, 1], [2, 1]],
+      2: [[0, 1], [0, 2], [1, 0], [1, 1]],
+      3: [[0, 0], [1, 0], [1, 1], [2, 1]],
+    },
+    'Z': {
+      0: [[0, 0], [0, 1], [1, 1], [1, 2]],
+      1: [[0, 1], [1, 0], [1, 1], [2, 0]],
+      2: [[0, 0], [0, 1], [1, 1], [1, 2]],
+      3: [[0, 1], [1, 0], [1, 1], [2, 0]],
+    }
+  }[tetromino.type][tetromino.rotation];
+
+  if (!positions) {
+    console.log('what the fuck', tetromino);
   }
+  return positions.map(([x, y]) => ({
+    x, y
+  }));
 }
 
 const render = (ctx: CanvasRenderingContext2D, state: GameState) => {
@@ -241,7 +241,7 @@ const render = (ctx: CanvasRenderingContext2D, state: GameState) => {
 
   const drawTetromino = (tetromino: Tetromino) => {
     const color = TetrominoColors[tetromino.type];
-    const occupiedCells = getTetrominoPositions(tetromino.type);
+    const occupiedCells = getTetrominoPositions(tetromino);
 
     occupiedCells.forEach((cell) => {
       // absolute board position for this tetromino
