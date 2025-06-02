@@ -7,10 +7,9 @@ const CANVAS_HEIGHT = 400;
 const CELL_SIZE = 20;
 
 // update loop constants
-const FPS = 10;
-
-// TODO seems a little odd no? this is actually controlling game piece drop speed
+const FPS = 60;
 const UPDATE_INTERVAL_MS = 1000 / FPS;
+const DROP_INTERVAL_MS = 1000; // drop 1 cell every DROP_INTERVAL_MS millisecond
 
 enum InputKey {
   ArrowLeft = 'ArrowLeft',
@@ -58,6 +57,8 @@ type GameState = {
   board: Board;
   currentTetromino: Tetromino;
   nextTetromino: Tetromino;
+  dropAccumulatorMs: number,
+  lastDropTimeMs: number,
 }
 
 // utils
@@ -66,7 +67,7 @@ const getCurrentTimeMs = () => performance.now();
 
 const setupInputHandlers = (state: GameState) => {
   window.addEventListener('keydown', (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (Object.values(InputKey).includes(e.key as InputKey)) {
       state.input.keyPressed = e.key as InputKey;
     }
@@ -89,13 +90,13 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
       state.board.cells[boardY][boardX] = state.currentTetromino.type;
     });
 
-    // todo refresh current tetromino as next,
-    // and create a new next ?
+    // Spawn new piece
     state.currentTetromino = {
       type: getRandomTetromino(),
       position: { x: 4, y: 0 },
       rotation: 0,
     };
+    // TODO spawn next piece
   }
 
   // returns true if tetromino with corner at (x, y) collides with either another tetromino
@@ -127,7 +128,10 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
   let newY = state.currentTetromino.position.y;
 
   // automatically drop piece
-  ++newY;
+  if (state.dropAccumulatorMs >= DROP_INTERVAL_MS) {
+    ++newY;
+    state.dropAccumulatorMs -= DROP_INTERVAL_MS;
+  }
 
   // attempt a move from user input
   switch (state.input.keyPressed) {
@@ -163,6 +167,7 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
   if (collides(newX, newY)) {
     // ignore newX and newY, because the piece can move no further
     commitTetrominoToBoard();
+    state.dropAccumulatorMs = 0; // reset after landing
   } else {
     state.currentTetromino.position = {
       x: newX,
@@ -176,59 +181,7 @@ const update = (ctx: CanvasRenderingContext2D, state: GameState) => {
 
 // TODO move this out
 // const getTetrominoPositions = (type: TetrominoType, rotation: number): Position[] => {
-const getTetrominoPositions = (tetromino: Tetromino): Position[] => {
-  const positions = {
-    'T': {
-      0: [[0, 1], [1, 0], [1, 1], [1, 2]],
-      1: [[0, 1], [1, 0], [1, 1], [2, 1]],
-      2: [[1, 0], [1, 1], [1, 2], [2, 1]],
-      3: [[0, 1], [1, 1], [1, 2], [2, 1]],
-    },
-    'I': {
-      0: [[0, 0], [0, 1], [0, 2], [0, 3]],
-      1: [[0, 2], [1, 2], [2, 2], [3, 2]],
-      2: [[0, 0], [0, 1], [0, 2], [0, 3]],
-      3: [[0, 2], [1, 2], [2, 2], [3, 2]],
-    },
-    'L': {
-      0: [[0, 1], [1, 1], [2, 1], [2, 2]],
-      1: [[0, 0], [1, 0], [1, 1], [1, 2]],
-      2: [[0, 0], [0, 1], [1, 1], [2, 1]],
-      3: [[1, 0], [1, 1], [1, 2], [2, 2]],
-    },
-    'J': {
-      0: [[0, 1], [1, 1], [2, 1], [2, 0]],
-      1: [[0, 0], [1, 0], [1, 1], [1, 2]],
-      2: [[0, 1], [0, 2], [1, 1], [2, 1]],
-      3: [[1, 0], [1, 1], [1, 2], [0, 2]],
-    },
-    'O': {
-      0: [[0, 0], [0, 1], [1, 0], [1, 1]],
-      1: [[0, 0], [0, 1], [1, 0], [1, 1]],
-      2: [[0, 0], [0, 1], [1, 0], [1, 1]],
-      3: [[0, 0], [0, 1], [1, 0], [1, 1]],
-    },
-    'S': {
-      0: [[0, 1], [0, 2], [1, 0], [1, 1]],
-      1: [[0, 0], [1, 0], [1, 1], [2, 1]],
-      2: [[0, 1], [0, 2], [1, 0], [1, 1]],
-      3: [[0, 0], [1, 0], [1, 1], [2, 1]],
-    },
-    'Z': {
-      0: [[0, 0], [0, 1], [1, 1], [1, 2]],
-      1: [[0, 1], [1, 0], [1, 1], [2, 0]],
-      2: [[0, 0], [0, 1], [1, 1], [1, 2]],
-      3: [[0, 1], [1, 0], [1, 1], [2, 0]],
-    }
-  }[tetromino.type][tetromino.rotation];
 
-  if (!positions) {
-    console.log('what the fuck', tetromino);
-  }
-  return positions.map(([x, y]) => ({
-    x, y
-  }));
-}
 
 const render = (ctx: CanvasRenderingContext2D, state: GameState) => {
   const drawCell = (x: number, y: number, color: string) => {
@@ -298,26 +251,27 @@ const initGameState = (): GameState => {
       position: { x: 4, y: 0 },
       rotation: 0,
     },
+    dropAccumulatorMs: 0,
+    lastDropTimeMs: getCurrentTimeMs(),
   };
 };
 
 const GameLoop = (ctx: CanvasRenderingContext2D, state: GameState) => {
   let previousTime: number = getCurrentTimeMs();
-  let lag: number = 0;
+  // let lag: number = 0;
 
   const loop = () => {
     const currentTime: number = getCurrentTimeMs();
     const elapsedTime: number = currentTime - previousTime;
     previousTime = currentTime;
-    lag += elapsedTime;
 
-    // Note input processing is handled by event listeners, so no explicit "processInput" call is needed
-    while (lag >= UPDATE_INTERVAL_MS) {
+    // TODO account for lag in the browser repaint loop?
+    if (elapsedTime >= UPDATE_INTERVAL_MS) {
+      state.dropAccumulatorMs += elapsedTime;
       update(ctx, state);
-      lag -= UPDATE_INTERVAL_MS;
+      render(ctx, state);
     }
-
-    render(ctx, state);
+    
     requestAnimationFrame(loop); // Re-update before next browser repaint step
   };
 
