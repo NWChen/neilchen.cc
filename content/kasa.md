@@ -6,7 +6,7 @@ description: I used a smart outlet as a physical interface to blocking websites.
 tag: project
 ---
 
-I wrote a [script](https://github.com/NWChen/laptop-brick) that runs in the background, polling for the state of an [$8 smart plug](https://www.kasasmart.com/us/products/smart-plugs).
+I wrote a small [script](https://github.com/NWChen/laptop-brick) that runs in the background, polling for the state of an [$8 smart plug](https://www.kasasmart.com/us/products/smart-plugs).
 
 ![](https://cdn.thewirecutter.com/wp-content/media/2024/08/smart-plug-2048px-2206.jpg)
 
@@ -22,4 +22,4 @@ When you turn the switch on, the script updates `/etc/hosts` to effectively bloc
 127.0.0.1 reddit.com
 ```
 
-You can plug the switch into any outlet, ideally one far away from you. Now, whenever I want to visit a website in my blocklist, I have to physically get up and go to the switch. Alternatively, I could just manually edit `/etc/hosts`, but this additional step adds just enough friction to make me reconsider reflexively going to YouTube to mainline more brainrot.
+You can plug the switch into any outlet, ideally one far away from you. Now, whenever I want to visit a website in my blocklist, I have to physically get up and turn off the switch. Alternatively, I could just manually edit `/etc/hosts`, but this additional step adds just enough friction to make me reconsider reflexively distracting myself.
