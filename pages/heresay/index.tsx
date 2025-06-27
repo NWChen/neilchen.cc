@@ -1,7 +1,7 @@
 import { Container, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { getPoisInFrustum, initializeGmpConfig } from './GmpClient';
-import { generateContent } from './GeminiClient';
+import { getPoisInFrustum, initializeGmpConfig } from '../../lib/GmpClient';
+import { generateContent } from '../../lib/GeminiClient';
 
 type Position = {
   lat: number;
