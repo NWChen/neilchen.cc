@@ -157,11 +157,9 @@ export default function Heresay() {
             mt: 2,
             mb: 2,
             p: 2,
-            border: '2px solid',
-            borderColor: 'success.main',
             borderRadius: 2,
             backgroundColor: 'success.light',
-            boxShadow: 1,
+            boxShadow: 2,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -230,22 +228,6 @@ export default function Heresay() {
                   {position
                     ? position.lon.toFixed(5)
                     : <span style={{ color: 'red' }}>Unknown</span>}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  GEMINI_API_KEY
-                </TableCell>
-                <TableCell align="right">
-                  {geminiApiKey ? 'Set' : <span style={{ color: 'red' }}>Not set</span>}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  GOOGLE_API_KEY
-                </TableCell>
-                <TableCell align="right">
-                  {googleApiKey ? 'Set' : <span style={{ color: 'red' }}>Not set</span>}
                 </TableCell>
               </TableRow>
             </TableBody>
