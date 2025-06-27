@@ -152,9 +152,25 @@ export default function Heresay() {
       )}
 
       {poi && poi.trim().length > 0 ? (
-        <Typography variant="body1" sx={{ mt: 2, textAlign: 'center' }}>
-          <b>You're near:</b> {poi}
-        </Typography>
+        <Box
+          sx={{
+            mt: 2,
+            mb: 2,
+            p: 2,
+            border: '2px solid',
+            borderColor: 'success.main',
+            borderRadius: 2,
+            backgroundColor: 'success.light',
+            boxShadow: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="body1" sx={{ textAlign: 'center', color: 'success.contrastText' }}>
+            <b>You're near:</b> {poi}
+          </Typography>
+        </Box>
       ) : (
         <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
           No POI information available yet.
@@ -166,10 +182,8 @@ export default function Heresay() {
           mt: 3,
           mb: 3,
           p: 3,
-          border: '2px solid',
-          borderColor: 'primary.main',
           borderRadius: 2,
-          backgroundColor: 'background.paper',
+          backgroundColor: '#FFF9C4', // Use a valid yellow hex code (Material UI yellow[100])
           boxShadow: 2,
           maxWidth: '100%',
         }}
