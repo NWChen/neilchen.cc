@@ -98,7 +98,7 @@ export default function Heresay() {
       return;
     }
     fetchPoiString(googleApiKey, position).then(setPoi);
-  }, [position, googleApiKey]);
+  }, [position.lat, position.lon, googleApiKey]);
 
   // Call Gemini on changes to POI.
   useEffect(() => {
@@ -187,7 +187,7 @@ export default function Heresay() {
         }}
       >
         <Typography variant="subtitle1" sx={{ textAlign: 'center', mb: 2 }}>
-          <i>Here's something you might not know about your surroundings:</i>
+          <b>Here's something you might not know about your surroundings:</b>
         </Typography>
         {fact && fact.trim().length > 0 ? (
           <Typography variant="body1" sx={{ textAlign: 'center' }}>
