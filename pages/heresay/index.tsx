@@ -98,7 +98,7 @@ export default function Heresay() {
       return;
     }
     fetchPoiString(googleApiKey, position).then(setPoi);
-  }, [position.lat, position.lon, googleApiKey]);
+  }, [position?.lat, position?.lon, googleApiKey]);
 
   // Call Gemini on changes to POI.
   useEffect(() => {
