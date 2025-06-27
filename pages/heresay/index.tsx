@@ -127,7 +127,7 @@ export default function Heresay() {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h1" sx={{ textAlign: 'center' }}>here:say</Typography>
+      <Typography variant="h1" sx={{ textAlign: 'center' }}>wander-live</Typography>
       {errorMessage && (
         <Typography variant="caption" color="error" sx={{ display: 'block', textAlign: 'center', mb: 1 }}>
           {errorMessage}
