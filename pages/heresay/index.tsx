@@ -188,13 +188,16 @@ export default function Heresay() {
           maxWidth: '100%',
         }}
       >
+        <Typography variant="subtitle1" sx={{ textAlign: 'center', mb: 2 }}>
+          <i>Here's something you might not know about your surroundings:</i>
+        </Typography>
         {fact && fact.trim().length > 0 ? (
-          <Typography variant="body2" sx={{ textAlign: 'center' }}>
+          <Typography variant="body1" sx={{ textAlign: 'center' }}>
             {fact}
           </Typography>
         ) : (
-          <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>
-            No Gemini response available yet.
+          <Typography variant="body1" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+            No response available yet.
           </Typography>
         )}
       </Box>
