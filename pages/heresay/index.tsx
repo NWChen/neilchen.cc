@@ -1,4 +1,4 @@
-import { Container, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, CircularProgress } from '@mui/material';
+import { Button, Container, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { getPoisInFrustum, initializeGmpConfig } from '../../lib/GmpClient';
 import { generateContent } from '../../lib/GeminiClient';
@@ -125,6 +125,13 @@ export default function Heresay() {
     }
   }, [fact]);
 
+  const handleTwiddle = () => {
+    if (position) {
+      const newLat = position.lat + 0.5;
+      setPosition({ ...position, lat: newLat });
+    }
+  };
+
   return (
     <Container maxWidth="sm">
       <Typography variant="h1" sx={{ textAlign: 'center' }}>wander-live</Typography>
@@ -171,7 +178,7 @@ export default function Heresay() {
         </Box>
       ) : (
         <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
-          No POI information available yet.
+          Loading POI information...
         </Typography>
       )}
 
@@ -195,13 +202,13 @@ export default function Heresay() {
           </Typography>
         ) : (
           <Typography variant="body1" sx={{ textAlign: 'center', color: 'text.secondary' }}>
-            No response available yet.
+            Loading information about your surroundings...
           </Typography>
         )}
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 3 }}>
-        <TableContainer component={Paper} sx={{ width: '50%' }}>
+        <TableContainer component={Paper} sx={{ width: '75%' }}>
           <Table aria-label="Debug">
             <TableHead>
               <TableRow>
@@ -233,6 +240,14 @@ export default function Heresay() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Button
+          variant="contained"
+          onClick={handleTwiddle}
+          disabled={!position}
+          sx={{ ml: 2, alignSelf: 'center', height: 'fit-content' }}
+        >
+          Twiddle
+        </Button>
       </Box>
     </Container>
   );
