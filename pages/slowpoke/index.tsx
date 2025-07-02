@@ -130,12 +130,15 @@ const getTimeEstimate = (
 };
 
 const getDeltasSummary = (deltas: PositionDelta[]): string => {
-  // Helper to format Date as h:mm
+  // Helper to format Date as h:mm AM/PM
   const formatTime = (date: Date | undefined) => {
     if (!date) return "N/A";
     let h = date.getHours();
     let m = date.getMinutes();
-    return `${h}:${m.toString().padStart(2, '0')}`;
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    let hour12 = h % 12;
+    if (hour12 === 0) hour12 = 12;
+    return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
   };
 
   return [
@@ -236,39 +239,43 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <TableContainer component={Paper} sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}>
-        <TableRow>
-          <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
-            Current position
-          </TableCell>
-          <TableCell align="right">
-            {position
-              ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
-              : 'unknown'}
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
-            Pace (min/mi)
-          </TableCell>
-          <TableCell align="right">
-            <input
-              type="number"
-              min="0"
-              value={paceMinutesPerMile}
-              onChange={e => {
-                const val = e.target.value;
-                if (val === "") {
-                  return;
-                }
-                const num = Number(val);
-                if (!isNaN(num)) {
-                  setPaceMinutesPerMile(num);
-                }
-              }}
-              inputMode="decimal"
-            />
-          </TableCell>
-        </TableRow>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                Current position
+              </TableCell>
+              <TableCell align="right">
+                {position
+                  ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
+                  : 'unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                Pace (min/mi)
+              </TableCell>
+              <TableCell align="right">
+                <input
+                  type="number"
+                  min="0"
+                  value={paceMinutesPerMile}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      return;
+                    }
+                    const num = Number(val);
+                    if (!isNaN(num)) {
+                      setPaceMinutesPerMile(num);
+                    }
+                  }}
+                  inputMode="decimal"
+                />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </TableContainer>
 
       {/* Text region with "Copy to clipboard" button */}
