@@ -11,7 +11,7 @@ type Position = {
 }
 
 type PoiRow = {
-  name: string;
+  name?: string;
   position: Position;
 }
 
@@ -107,13 +107,12 @@ const getPoiDeltas = (
       const etaUpperBound = new Date(now.getTime() + etaUpperMinutes * 60 * 1000);
 
       const delta = {
-        poi,
-        routeRow: nearestToPoi,
+        poi: poi,
+        routeRow: nearestToPosition,
         distanceInMiles,
         etaLowerBound,
         etaUpperBound,
       };
-      console.log(delta);
       return delta;
     })
     .filter(delta => typeof delta.distanceInMiles === 'number' && delta.distanceInMiles > 0);
@@ -141,7 +140,7 @@ const getDeltasSummary = (deltas: PositionDelta[]): string => {
 
   return [
     deltas.length > 0 && deltas[0].routeRow
-      ? `We're currently here: https://maps.google.com/?q=${deltas[0].routeRow.position.lat},${deltas[0].routeRow.position.lon}. Estimated arrival times:`
+      ? `We're currently here on our route: https://maps.google.com/?q=${deltas[0].routeRow.position.lat},${deltas[0].routeRow.position.lon}. Estimated arrival times:`
       : "We're currently here: (unknown location). Estimated arrival times:",
     ...deltas.map(delta => {
       const name = delta.poi?.name ?? "Unknown";
@@ -237,20 +236,16 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <TableContainer component={Paper} sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}>
-        <Table size="small" aria-label="position table">
-          <TableBody>
-            <TableRow>
-              <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
-                Current position
-              </TableCell>
-              <TableCell align="right">
-                {position
-                  ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
-                  : 'unknown'}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <TableRow>
+          <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+            Current position
+          </TableCell>
+          <TableCell align="right">
+            {position
+              ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
+              : 'unknown'}
+          </TableCell>
+        </TableRow>
         <TableRow>
           <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
             Pace (min/mi)
@@ -286,12 +281,10 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           value={deltasSummary}
           style={{
             width: '100%',
-            minHeight: '200px',
+            minHeight: '300px',
             resize: 'vertical',
-            marginBottom: '16px',
             fontFamily: 'monospace',
             fontSize: '0.85rem',
-            padding: '8px',
             boxSizing: 'border-box'
           }}
         />
@@ -319,7 +312,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
       </Paper>
 
       {deltas && deltas.length > 0 && (
-        <TableContainer component={Paper} sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}>
+        <TableContainer component={Paper} sx={{ maxWidth: 600, mx: 'auto', mb: 2 }}>
           <Table size="small" aria-label="deltas table">
             <TableHead>
               <TableRow>
