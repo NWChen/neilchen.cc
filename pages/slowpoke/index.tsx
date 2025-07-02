@@ -274,11 +274,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginRight: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
-                  aria-label="decrement pace"
+                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
+                  aria-label="increment pace"
                   type="button"
                 >
-                  -
+                  +
                 </button>
                 <input
                   type="number"
@@ -308,11 +308,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginLeft: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
-                  aria-label="increment pace"
+                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
+                  aria-label="decrement pace"
                   type="button"
                 >
-                  +
+                  -
                 </button>
               </TableCell>
             </TableRow>
