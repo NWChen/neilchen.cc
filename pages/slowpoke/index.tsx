@@ -24,6 +24,7 @@ type RouteRow = {
 type PositionDelta = {
   poi: PoiRow | undefined;
   routeRow: RouteRow | undefined;
+  currentPosition: Position | undefined;
   distanceInMiles: number;
   etaLowerBound: Date;
   etaUpperBound: Date;
@@ -109,6 +110,7 @@ const getPoiDeltas = (
       const delta = {
         poi: poi,
         routeRow: nearestToPosition,
+        currentPosition: position,
         distanceInMiles,
         etaLowerBound,
         etaUpperBound,
@@ -142,8 +144,8 @@ const getDeltasSummary = (deltas: PositionDelta[]): string => {
   };
 
   return [
-    deltas.length > 0 && deltas[0].routeRow
-      ? `We're currently here on our route: https://maps.google.com/?q=${deltas[0].routeRow.position.lat},${deltas[0].routeRow.position.lon}. Estimated arrival times:`
+    deltas.length > 0 && deltas[0].currentPosition
+      ? `We're currently here: https://maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}. Estimated arrival times:`
       : "We're currently here: (unknown location). Estimated arrival times:",
     ...deltas.map(delta => {
       const name = delta.poi?.name ?? "Unknown";
