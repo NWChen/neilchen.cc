@@ -205,10 +205,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
         };
-        const deltas = getPoiDeltas(newPosition, pois, route, paceMinutesPerMile);
         setPosition(newPosition);
-        setDeltas(deltas);
-        setDeltasSummary(getDeltasSummary(deltas));
         console.log(`Updated position: ${newPosition.lat}, ${newPosition.lon}`);
       },
       (err) => {
@@ -224,6 +221,13 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
+
+  useEffect(() => {
+    if (position == undefined) return;
+    const deltas = getPoiDeltas(position, pois, route, paceMinutesPerMile);
+    setDeltas(deltas);
+    setDeltasSummary(getDeltasSummary(deltas));
+  }, [position, paceMinutesPerMile]);
 
   const handleCopy = async () => {
     if (navigator && navigator.clipboard) {
@@ -265,12 +269,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                   onChange={e => {
                     const val = e.target.value;
                     if (val === "") {
-                      return;
+                      return 0;
                     }
                     const num = Number(val);
-                    if (!isNaN(num)) {
-                      setPaceMinutesPerMile(num);
-                    }
+                    const sanitizedNum = isNaN(num) ? 0 : num;
+                    setPaceMinutesPerMile(sanitizedNum);
                   }}
                   inputMode="decimal"
                 />
