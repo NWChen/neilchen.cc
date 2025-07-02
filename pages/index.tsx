@@ -78,6 +78,7 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
     </Container>
   );
 };
+
 export const getStaticProps = (async () => {
   const posts = await getMarkdownPosts();
 
