@@ -25,6 +25,7 @@ type PositionDelta = {
   poi: PoiRow | undefined;
   routeRow: RouteRow | undefined;
   currentPosition: Position | undefined;
+  distanceSoFarMiles: number | undefined;
   distanceInMiles: number;
   etaLowerBound: Date;
   etaUpperBound: Date;
@@ -111,6 +112,7 @@ const getPoiDeltas = (
         poi: poi,
         routeRow: nearestToPosition,
         currentPosition: position,
+        distanceSoFarMiles: nearestToPosition.cumulativeDistanceMeters * 0.000621371,
         distanceInMiles,
         etaLowerBound,
         etaUpperBound,
@@ -145,7 +147,13 @@ const getDeltasSummary = (deltas: PositionDelta[], paceMinutesPerMile: number = 
 
   return [
     deltas.length > 0 && deltas[0].currentPosition
-      ? `📍Nick is here: maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}\nCurrent pace: ~${paceMinutesPerMile}minutes / mile\n\n*Estimated arrival times:*`
+      ? [
+          `📍 *Nick is here:* maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}`,
+          `*Current pace*: ~${paceMinutesPerMile} min/mi`,
+          `*Completed so far*: ${deltas[0].distanceSoFarMiles?.toFixed(1)}mi`,
+          ``,
+          `*Estimated arrival times:*`
+        ].join('\n')
       : "We're currently here: (unknown location). Estimated arrival times:",
     ...deltas.map(delta => {
       const name = delta.poi?.name ?? "Unknown";
@@ -155,7 +163,7 @@ const getDeltasSummary = (deltas: PositionDelta[], paceMinutesPerMile: number = 
           : "N/A";
       const etaLower = formatTime(delta.etaLowerBound);
       const etaUpper = formatTime(delta.etaUpperBound);
-      return `- *${name}*: ${distance}mi away (ETA: ${etaLower}–${etaUpper})`;
+      return `- *${name}*: ${etaLower}–${etaUpper} (${distance}mi away)`;
     })
   ].join('\n');
 };
@@ -274,7 +282,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginRight: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
+                  onClick={() =>
+                    setPaceMinutesPerMile(prev =>
+                      Math.max(0, Math.round((prev - 0.5) * 10) / 10)
+                    )
+                  }
                   aria-label="decrement pace"
                   type="button"
                 >
@@ -283,14 +295,16 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                 <input
                   type="number"
                   min="0"
-                  value={paceMinutesPerMile}
+                  step="0.5"
+                  value={paceMinutesPerMile.toFixed(1)}
                   onChange={e => {
                     const val = e.target.value;
                     if (val === "") {
-                      return 0;
+                      setPaceMinutesPerMile(0);
+                      return;
                     }
                     const num = Number(val);
-                    const sanitizedNum = isNaN(num) ? 0 : num;
+                    const sanitizedNum = isNaN(num) ? 0 : Math.max(0, Math.round(num * 10) / 10);
                     setPaceMinutesPerMile(sanitizedNum);
                   }}
                   inputMode="decimal"
@@ -308,7 +322,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginLeft: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
+                  onClick={() =>
+                    setPaceMinutesPerMile(prev =>
+                      Math.round((prev + 0.5) * 10) / 10
+                    )
+                  }
                   aria-label="increment pace"
                   type="button"
                 >
@@ -321,10 +339,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
       </TableContainer>
 
       {/* Text region with "Copy to clipboard" button */}
-      <Paper sx={{ maxWidth: 400, mx: 'auto', mb: 2, p: 2 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Deltas Summary
-        </Typography>
+      <Paper sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}>
         <textarea
           readOnly
           value={deltasSummary}
