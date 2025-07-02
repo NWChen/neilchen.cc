@@ -3,7 +3,7 @@ import fs from 'fs';
 import { GetStaticProps } from 'next/types';
 import path from 'path';
 import React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 type Position = {
   lat: number;
@@ -131,7 +131,7 @@ const getTimeEstimate = (
   return [snap(lower), snap(upper)];
 };
 
-const getDeltasSummary = (deltas: PositionDelta[]): string => {
+const getDeltasSummary = (deltas: PositionDelta[], paceMinutesPerMile: number = 10): string => {
   // Helper to format Date as h:mm AM/PM
   const formatTime = (date: Date | undefined) => {
     if (!date) return "N/A";
@@ -145,7 +145,7 @@ const getDeltasSummary = (deltas: PositionDelta[]): string => {
 
   return [
     deltas.length > 0 && deltas[0].currentPosition
-      ? `We're currently here: https://maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}. Estimated arrival times:`
+      ? `📍Nick is here: maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}\nCurrent pace: ~${paceMinutesPerMile}minutes / mile\n\n*Estimated arrival times:*`
       : "We're currently here: (unknown location). Estimated arrival times:",
     ...deltas.map(delta => {
       const name = delta.poi?.name ?? "Unknown";
@@ -162,15 +162,11 @@ const getDeltasSummary = (deltas: PositionDelta[]): string => {
 
 export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: RouteRow[] }) {
   const [position, setPosition] = useState<Position>();
-  const [lastPosition, setLastPosition] = useState<Position | undefined>(undefined);
   const [deltas, setDeltas] = useState<PositionDelta[]>([]);
   const [deltasSummary, setDeltasSummary] = useState<string | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [paceMinutesPerMile, setPaceMinutesPerMile] = useState<number>(10);
   const [copied, setCopied] = React.useState(false);
-
-  // Store previous position in a ref to avoid stale closure
-  const prevPositionRef = useRef<Position | undefined>(undefined);
 
   // Poll for location
   useEffect(() => {
@@ -188,7 +184,6 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           lon: pos.coords.longitude,
         };
         setPosition(newPosition);
-        // Don't set lastPosition here, as this is the initial position
         console.log(`Initial position: ${newPosition.lat}, ${newPosition.lon}`);
       },
       (err) => {
@@ -210,10 +205,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
         };
-        // Store the previous position as lastPosition, if there was one
-        setLastPosition(prev => position ? { ...position } : prev);
         setPosition(newPosition);
-        prevPositionRef.current = newPosition;
         console.log(`Updated position: ${newPosition.lat}, ${newPosition.lon}`);
       },
       (err) => {
@@ -228,22 +220,13 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Update lastPosition when position changes (except for initial mount)
-  useEffect(() => {
-    if (position !== undefined && prevPositionRef.current !== undefined && position !== prevPositionRef.current) {
-      setLastPosition(prevPositionRef.current);
-    }
-    prevPositionRef.current = position;
-  }, [position]);
 
   useEffect(() => {
     if (position == undefined) return;
     const deltas = getPoiDeltas(position, pois, route, paceMinutesPerMile);
     setDeltas(deltas);
-    setDeltasSummary(getDeltasSummary(deltas));
+    setDeltasSummary(getDeltasSummary(deltas, paceMinutesPerMile));
   }, [position, paceMinutesPerMile]);
 
   const handleCopy = async () => {
@@ -276,16 +259,6 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
             </TableRow>
             <TableRow>
               <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
-                Last position
-              </TableCell>
-              <TableCell align="right">
-                {lastPosition
-                  ? `${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}`
-                  : 'none'}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
                 Pace (min/mi)
               </TableCell>
               <TableCell align="right" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
@@ -301,11 +274,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginRight: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
-                  aria-label="increment pace"
+                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
+                  aria-label="decrement pace"
                   type="button"
                 >
-                  +
+                  -
                 </button>
                 <input
                   type="number"
@@ -335,11 +308,11 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     cursor: 'pointer',
                     marginLeft: '0.5em'
                   }}
-                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
-                  aria-label="decrement pace"
+                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
+                  aria-label="increment pace"
                   type="button"
                 >
-                  -
+                  +
                 </button>
               </TableCell>
             </TableRow>
