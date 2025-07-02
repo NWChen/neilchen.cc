@@ -261,7 +261,25 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
               <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
                 Pace (min/mi)
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+                <button
+                  style={{
+                    width: '2em',
+                    height: '2em',
+                    fontSize: '1.2em',
+                    fontWeight: 'bold',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    background: '#f5f5f5',
+                    cursor: 'pointer',
+                    marginRight: '0.5em'
+                  }}
+                  onClick={() => setPaceMinutesPerMile(prev => Math.max(0, prev - 1))}
+                  aria-label="decrement pace"
+                  type="button"
+                >
+                  -
+                </button>
                 <input
                   type="number"
                   min="0"
@@ -276,7 +294,26 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                     setPaceMinutesPerMile(sanitizedNum);
                   }}
                   inputMode="decimal"
+                  style={{ width: '4em', textAlign: 'center' }}
                 />
+                <button
+                  style={{
+                    width: '2em',
+                    height: '2em',
+                    fontSize: '1.2em',
+                    fontWeight: 'bold',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    background: '#f5f5f5',
+                    cursor: 'pointer',
+                    marginLeft: '0.5em'
+                  }}
+                  onClick={() => setPaceMinutesPerMile(prev => prev + 1)}
+                  aria-label="increment pace"
+                  type="button"
+                >
+                  +
+                </button>
               </TableCell>
             </TableRow>
           </TableBody>
