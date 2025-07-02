@@ -124,7 +124,7 @@ const getTimeEstimate = (
   distanceInMiles: number,
   paceMinutesPerMile: number
 ): [number, number] => {
-  const snapIntervalMinutes = 5;
+  const snapIntervalMinutes = 1;
   const snap = (min: number) => Math.round(min / snapIntervalMinutes) * snapIntervalMinutes;
   const lower = distanceInMiles * paceMinutesPerMile;
   const upper = lower + Math.ceil(distanceInMiles) * 1; // add 1 min per mile for error
