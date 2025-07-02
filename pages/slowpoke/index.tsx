@@ -3,7 +3,7 @@ import fs from 'fs';
 import { GetStaticProps } from 'next/types';
 import path from 'path';
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 type Position = {
   lat: number;
@@ -162,11 +162,15 @@ const getDeltasSummary = (deltas: PositionDelta[]): string => {
 
 export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: RouteRow[] }) {
   const [position, setPosition] = useState<Position>();
+  const [lastPosition, setLastPosition] = useState<Position | undefined>(undefined);
   const [deltas, setDeltas] = useState<PositionDelta[]>([]);
   const [deltasSummary, setDeltasSummary] = useState<string | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [paceMinutesPerMile, setPaceMinutesPerMile] = useState<number>(10);
   const [copied, setCopied] = React.useState(false);
+
+  // Store previous position in a ref to avoid stale closure
+  const prevPositionRef = useRef<Position | undefined>(undefined);
 
   // Poll for location
   useEffect(() => {
@@ -184,6 +188,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           lon: pos.coords.longitude,
         };
         setPosition(newPosition);
+        // Don't set lastPosition here, as this is the initial position
         console.log(`Initial position: ${newPosition.lat}, ${newPosition.lon}`);
       },
       (err) => {
@@ -205,7 +210,10 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
         };
+        // Store the previous position as lastPosition, if there was one
+        setLastPosition(prev => position ? { ...position } : prev);
         setPosition(newPosition);
+        prevPositionRef.current = newPosition;
         console.log(`Updated position: ${newPosition.lat}, ${newPosition.lon}`);
       },
       (err) => {
@@ -220,7 +228,16 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Update lastPosition when position changes (except for initial mount)
+  useEffect(() => {
+    if (position !== undefined && prevPositionRef.current !== undefined && position !== prevPositionRef.current) {
+      setLastPosition(prevPositionRef.current);
+    }
+    prevPositionRef.current = position;
+  }, [position]);
 
   useEffect(() => {
     if (position == undefined) return;
@@ -255,6 +272,16 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                 {position
                   ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
                   : 'unknown'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
+                Last position
+              </TableCell>
+              <TableCell align="right">
+                {lastPosition
+                  ? `${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}`
+                  : 'none'}
               </TableCell>
             </TableRow>
             <TableRow>
