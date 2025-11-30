@@ -34,6 +34,9 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
             <Button variant="text" color="primary" href="/blog">
               Blog
             </Button>
+            <Button variant="text" color="primary" href="/bakes">
+              Jessie's Bakes
+            </Button>
             <Button variant="text" color="primary" href="mailto:neilwchen@gmail.com">
               Contact
             </Button>
