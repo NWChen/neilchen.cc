@@ -26,7 +26,7 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
           alignItems: "flex-start",
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography variant="h1" sx={{ alignSelf: "flex-start" }}>
             Neil Chen
           </Typography>
@@ -34,9 +34,9 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
             <Button variant="text" color="primary" href="/blog">
               Blog
             </Button>
-            <Button variant="text" color="primary" href="/bakes">
+            {/* <Button variant="text" color="primary" href="/bakes">
               Jessie's Bakes
-            </Button>
+            </Button> */}
             <Button variant="text" color="primary" href="mailto:neilwchen@gmail.com">
               Contact
             </Button>
@@ -68,12 +68,12 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
           />
         </Box>
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider sx={{ my: 2 }} />
       <Box>
         <Typography variant="h2">Projects</Typography>
         <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Project)} />
       </Box>
-      <Divider sx={{ my: 4 }} />
+      <Divider sx={{ my: 2 }} />
       <Box>
         <Typography variant="h2">Notes</Typography>
         <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Note)} />

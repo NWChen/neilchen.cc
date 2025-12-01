@@ -2,6 +2,18 @@ body, .MuiTypography-root, button, .MuiButton-root {
   font-family: 'EB Garamond', 'Garamond', 'Cormorant Garamond', serif !important;
 }
 
+body {
+  font-size: 1.125rem !important;
+}
+
+button, .MuiButton-root {
+  font-size: 1rem !important;
+}
+
+button, .MuiButton-root {
+  text-transform: none !important;
+}
+
 h1.MuiTypography-root {
   font-size: 3rem !important;
 }
@@ -12,6 +24,10 @@ h2.MuiTypography-root {
 
 h3.MuiTypography-root {
   font-size: 1.5rem !important;
+}
+
+.MuiTypography-body1 {
+  font-size: 1.125rem !important;
 }
 
 .MuiButton-root.MuiButton-textPrimary,
