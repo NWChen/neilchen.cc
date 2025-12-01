@@ -347,7 +347,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
             width: '100%',
             minHeight: '300px',
             resize: 'vertical',
-            fontFamily: 'monospace',
+            fontFamily: '"EB Garamond", "Garamond", "Cormorant Garamond", serif',
             fontSize: '0.85rem',
             boxSizing: 'border-box'
           }}
