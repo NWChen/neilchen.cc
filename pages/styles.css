@@ -4,6 +4,7 @@ body, .MuiTypography-root, button, .MuiButton-root {
 
 body {
   font-size: 1.125rem !important;
+  /* background-color: #f8f0e5 !important; */
 }
 
 button, .MuiButton-root {
@@ -28,15 +29,6 @@ h3.MuiTypography-root {
 
 .MuiTypography-body1 {
   font-size: 1.125rem !important;
-}
-
-.MuiButton-root.MuiButton-textPrimary,
-.MuiButton-root.MuiButton-containedPrimary {
-  color: blue !important;
-}
-
-.MuiButton-root.MuiButton-containedPrimary {
-  background-color: blue !important;
 }
 
 a, .MuiLink-root {
