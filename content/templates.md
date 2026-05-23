@@ -9,8 +9,8 @@ tag: project
 A recursive Fibonacci number implementation in C++ is straightforward:
 
 ```cpp
-long long fib(int n) {
-  if (n == 2) return 1;
+int fib(int n) {
+  if (n <= 1) return n;
   return fib(n - 1) + fib(n - 2);
 }
 
@@ -21,23 +21,23 @@ int main() {
 }
 ```
 
-But a Fibonacci number implementation in C++ _templates_ is also possible:
+C++ **templates** let us write "generic" code, based on some parameters, at compile-time. The C++ compiler then generates code for us based on each type/value instantiation. It turns out a Fibonacci number implementation in C++ templates is also possible:
 
 ```cpp
 template <int N>
 struct Fib {
-  static constexpr long long value =
+  static constexpr int value =
     Fib<N-1>::value + Fib<N-2>::value;
 };
                                                                             
 template <>                                                                  
 struct Fib<0> {
-  static constexpr long long value = 0;
+  static constexpr int value = 0;
 };
                                                                             
 template <>                                                                  
 struct Fib<1> {
-  static constexpr long long value = 1;
+  static constexpr int value = 1;
 }; 
 
 int main() {
@@ -47,12 +47,8 @@ int main() {
 }
 ```
 
-This generates the same output -- but all the computation is done at copmile-time!
+This generates the same output! In the implementation using `template`s, the only meaningful work done at runtime is printing to `stdout`. All the computation is done at compile-time! The C++ compiler evaluates the recursive function call graph for us. The two explicit template specializations `Fib<0>` and `Fib<1>` handle the base case.
 
-In the implementation using templates, the only meaningful work done at runtime is printing to `stdout`. Compile-time recursion handles generating the Fibonacci numbers for us.
+The `static constexpr` keywords indicate that values can be evaluated at compile-time. Specifically, the compiler generates (in this case) 11 unique class definitions `Fib<0>, ..., Fib<10>`.
 
-Two explicit template specializations `Fib<0>` and `Fib<1>` handle the base case for us. These are **explicit** specializations since they force instantiation of the corresponding `struct` (for values `0` and `1`).
-
-Everything is marked for resolution at compile-time thanks to the `constexpr` type. Specifically, the compiler generates (in this case) 10 unique class definitions `Fib<0>, ..., Fib<10>`.
-
-Finally, as `n` approaches a (fairly small) limit, compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
+Finally, as `n` approaches a configurable but generally small limit (namely `-ftemplate-depth`), compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
