@@ -51,4 +51,4 @@ This generates the same output! In the implementation using `template`s, the onl
 
 The `static constexpr` keywords indicate that values can be evaluated at compile-time. Specifically, the compiler generates (in this case) 11 unique class definitions `Fib<0>, ..., Fib<10>`.
 
-Finally, as `n` approaches a configurable but generally small limit (namely `-ftemplate-depth`), compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
+Finally, as `n` approaches a limit (configurable via `-ftemplate-depth`), compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
