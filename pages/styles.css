@@ -34,3 +34,8 @@ h3.MuiTypography-root {
 a, .MuiLink-root {
   color: blue !important;
 }
+
+pre, code, .hljs {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+  font-size: 0.9rem !important;
+}
