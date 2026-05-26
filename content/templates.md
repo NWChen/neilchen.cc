@@ -48,9 +48,12 @@ int main() {
 ```
 
 This generates the same output! In the implementation using `template`s, the only meaningful work done at runtime is printing to `stdout`. All the computation is done at compile-time:
+
 - The C++ compiler evaluates a recursive function call graph for us. Upon encountering `Fib<N>`, it pattern-matches against all known template specializations, namely for `Fib<N-1>` and `Fib<N-2>`.
 - The two explicit template specializations `Fib<0>` and `Fib<1>` handle the base case.
 
 The `static constexpr` keywords indicate that values can be evaluated at compile-time. Specifically, the compiler generates (in this case) 11 unique class definitions `Fib<0>, ..., Fib<10>`.
 
 Finally, as `n` approaches a limit (configurable via `-ftemplate-depth`), compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
+
+Template specialization is conditional branching, and template instantiation serves as a key-value store. Here's a more [complete demonstrations](https://rtraba.com/wp-content/uploads/2015/05/cppturing.pdf) that C++ templates are Turing-complete.
