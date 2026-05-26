@@ -56,4 +56,4 @@ The `static constexpr` keywords indicate that values can be evaluated at compile
 
 Finally, as `n` approaches a limit (configurable via `-ftemplate-depth`), compilation will fail with something like `fatal error: recursive template instantiation exceeded maximum depth`.
 
-Template specialization is conditional branching, and template instantiation serves as a key-value store. Here's a more [complete demonstrations](https://rtraba.com/wp-content/uploads/2015/05/cppturing.pdf) that C++ templates are Turing-complete.
+Template specialization is conditional branching, and template instantiation serves as a key-value store. Here's a more [complete demonstration](https://rtraba.com/wp-content/uploads/2015/05/cppturing.pdf) that C++ templates are Turing-complete.
