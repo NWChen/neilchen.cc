@@ -1,5 +1,5 @@
 ---
-title: C++ template instantiation is Turing-complete
+title: C++ template system is Turing-complete
 slug: cpp-templates
 date: 2026-05
 description: C++ templates are a powerful language.
