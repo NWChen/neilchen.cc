@@ -427,8 +427,10 @@ const _parseCsv = (filePath: string): string[][] => {
 };
 
 export const getStaticProps = (async () => {
-  const poisPath = path.join(process.cwd(), 'lib', 'pois.csv');
-  const routePath = path.join(process.cwd(), 'lib', 'route.csv');
+  // const poisPath = path.join(process.cwd(), 'lib', 'pois.csv');
+  const poisPath = path.join(process.cwd(), 'lib', 'pois2.csv');
+  // const routePath = path.join(process.cwd(), 'lib', 'route.csv');
+  const routePath = path.join(process.cwd(), 'lib', 'route2.csv');
   const pois = _parseCsv(poisPath).map((row: string[]) => {
     return {
       position: {
