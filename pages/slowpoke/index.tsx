@@ -89,6 +89,7 @@ const getPoiDeltas = (
   if (!nearestToPosition) {
     return [];
   }
+  console.log('Nearest position along route: ', nearestToPosition);
 
   const now = new Date();
   // For each POI, find the nearest point in route and compute the distance in miles
