@@ -3,7 +3,7 @@ import fs from 'fs';
 import { GetStaticProps } from 'next/types';
 import path from 'path';
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Position = {
   lat: number;
@@ -178,6 +178,48 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
   const [paceMinutesPerMile, setPaceMinutesPerMile] = useState<number>(10);
   const [copied, setCopied] = React.useState(false);
 
+  // Manual lat/lon override. Defaults to the browser-detected position, but
+  // once the user sets a value we stop letting the GPS watch overwrite it.
+  const [overridden, setOverridden] = useState(false);
+  const overriddenRef = useRef(false);
+  const [latField, setLatField] = useState('');
+  const [lonField, setLonField] = useState('');
+
+  // Mirror the detected position into the form fields until the user overrides.
+  useEffect(() => {
+    if (!overridden && position) {
+      setLatField(position.lat.toString());
+      setLonField(position.lon.toString());
+    }
+  }, [position, overridden]);
+
+  const applyOverride = () => {
+    const lat = parseFloat(latField);
+    const lon = parseFloat(lonField);
+    if (isNaN(lat) || isNaN(lon)) return;
+    overriddenRef.current = true;
+    setOverridden(true);
+    setPosition({ lat, lon });
+  };
+
+  const useDetectedPosition = () => {
+    overriddenRef.current = false;
+    setOverridden(false);
+    // Clearing the flag alone won't refresh position until the watch next
+    // fires, so actively grab a fresh fix now.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (overriddenRef.current) return;
+          setErrorMessage(undefined);
+          setPosition({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        },
+        (err) => setErrorMessage(`${err.code}: ${err.message}`),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    }
+  };
+
   // Poll for location
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -189,6 +231,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setErrorMessage(undefined);
+        if (overriddenRef.current) return;
         const newPosition = {
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
@@ -211,6 +254,7 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         setErrorMessage(undefined);
+        if (overriddenRef.current) return;
         const newPosition = {
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
@@ -262,9 +306,44 @@ export default function Slowpoke({ pois, route }: { pois: PoiRow[], route: Route
                 Current position
               </TableCell>
               <TableCell align="right">
-                {position
-                  ? `${position.lat.toFixed(6)}, ${position.lon.toFixed(6)}`
-                  : 'unknown'}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={latField}
+                      onChange={e => setLatField(e.target.value)}
+                      placeholder="lat"
+                      aria-label="latitude override"
+                      style={{ width: '7em', textAlign: 'right' }}
+                    />
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={lonField}
+                      onChange={e => setLonField(e.target.value)}
+                      placeholder="lon"
+                      aria-label="longitude override"
+                      style={{ width: '7em', textAlign: 'right' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <button type="button" onClick={applyOverride} style={{ cursor: 'pointer' }}>
+                      Set
+                    </button>
+                    <button
+                      type="button"
+                      onClick={useDetectedPosition}
+                      disabled={!overridden}
+                      style={{ cursor: overridden ? 'pointer' : 'default' }}
+                    >
+                      Use GPS
+                    </button>
+                  </div>
+                  {overridden && (
+                    <span style={{ fontSize: '0.75em', color: '#b26a00' }}>manual override</span>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
             <TableRow>
