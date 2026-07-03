@@ -135,6 +135,7 @@ const getTimeEstimate = (
 };
 
 const getDeltasSummary = (deltas: PositionDelta[], paceMinutesPerMile: number = 10): string => {
+  const now = new Date();
   // Helper to format Date as h:mm AM/PM
   const formatTime = (date: Date | undefined) => {
     if (!date) return "N/A";
@@ -149,11 +150,11 @@ const getDeltasSummary = (deltas: PositionDelta[], paceMinutesPerMile: number = 
   return [
     deltas.length > 0 && deltas[0].currentPosition
       ? [
-          `📍 *Nick is here:* maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}`,
+          `📍*Nick is here* (${formatTime(now)}): maps.google.com/?q=${deltas[0].currentPosition.lat.toFixed(5)},${deltas[0].currentPosition.lon.toFixed(5)}`,
           `*Current pace*: ~${paceMinutesPerMile} min/mi`,
           `*Completed so far*: ${deltas[0].distanceSoFarMiles?.toFixed(1)}mi`,
           ``,
-          `*Estimated arrival times:*`
+          `*Estimated arrivals:*`
         ].join('\n')
       : "We're currently here: (unknown location). Estimated arrival times:",
     ...deltas.map(delta => {
