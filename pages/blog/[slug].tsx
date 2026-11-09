@@ -1,6 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import Markdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
 import Head from "next/head";
 import { GetStaticPaths, GetStaticProps } from "next/types";
 import path from "path";
@@ -47,7 +48,7 @@ export default function Post({ metadata, content }: PostProps) {
           />
         )}
         <Typography component="div" variant="body1">
-          <Markdown rehypePlugins={[rehypeHighlight]} components={{
+          <Markdown rehypePlugins={[rehypeRaw, rehypeHighlight]} components={{
             img: renderers.image,
           }}>
             {content}

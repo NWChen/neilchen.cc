@@ -1,10 +1,11 @@
 import React from "react";
 
 export const renderers = {
-  image: ({ ...props })  => 
+  image: ({ style, ...props }: any) => 
     <img style={{ 
       maxWidth: '75%',
       display: 'block',
-      margin: '0 auto'
+      margin: '0 auto',
+      ...style,
     }} {...props}/>
 }
