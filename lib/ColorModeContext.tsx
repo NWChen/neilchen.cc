@@ -54,6 +54,16 @@ export function ColorModeProvider({ children }: { children: React.ReactNode }) {
           fontFamily: "'EB Garamond', 'Garamond', 'Cormorant Garamond', serif",
         },
         components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              a: {
+                color: mode === "dark" ? "#8ab4f8" : "#1a0dab",
+              },
+              "a:visited": {
+                color: mode === "dark" ? "#c58af9" : "#681da8",
+              },
+            },
+          },
           MuiLink: {
             styleOverrides: {
               root: {
