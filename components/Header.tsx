@@ -1,8 +1,12 @@
-import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, IconButton, Toolbar, Typography } from "@mui/material";
+import { DarkMode, LightMode } from "@mui/icons-material";
 import Link from "next/link";
 import React from "react";
+import { useColorMode } from "../lib/ColorModeContext";
 
 export default function Header() {
+  const { mode, toggleColorMode } = useColorMode();
+
   return (
     <AppBar position="static" color="transparent" elevation={0}>
       <Container maxWidth="lg">
@@ -13,18 +17,21 @@ export default function Header() {
             sx={{ flexGrow: 1 }}
           >
             <Link href="/" passHref>
-              <Button sx={{ textTransform: 'none', fontSize: 'inherit', color: 'black' }}>
+              <Button sx={{ textTransform: 'none', fontSize: 'inherit', color: 'text.primary' }}>
                 Neil Chen
               </Button>
             </Link>
           </Typography>
-          <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Link href="/" passHref>
               <Button>Home</Button>
             </Link>
             <Link href="/blog" passHref>
               <Button>Blog</Button>
             </Link>
+            <IconButton onClick={toggleColorMode} sx={{ ml: 1 }} aria-label="Toggle dark mode">
+              {mode === "dark" ? <LightMode /> : <DarkMode />}
+            </IconButton>
           </Box>
         </Toolbar>
       </Container>

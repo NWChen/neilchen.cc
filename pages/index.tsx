@@ -3,8 +3,10 @@ import {
   Button,
   Container,
   Box,
-  Divider, Typography
+  Divider, IconButton, Typography
 } from "@mui/material";
+import { DarkMode, LightMode } from "@mui/icons-material";
+import { useColorMode } from "../lib/ColorModeContext";
 import path from "path";
 import fs from "fs";
 import { CONTENT_DIR, ABOUT_FILE } from "../lib/constants";
@@ -16,8 +18,15 @@ import { PostMetadata, PostProps, Tag } from "../lib/post";
 import { getMarkdownPosts } from '../lib/getMarkdownPosts';
 
 export default function Home({ posts, blurb }: { posts: PostProps[], blurb: string }) {
+  const { mode, toggleColorMode } = useColorMode();
+
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <IconButton onClick={toggleColorMode} aria-label="Toggle dark mode">
+          {mode === "dark" ? <LightMode /> : <DarkMode />}
+        </IconButton>
+      </Box>
       <Box
         sx={{
           display: "flex",
