@@ -27,8 +27,7 @@ So I on the flight to NYC I CAD'd it up. I know a little bit about fabricating w
   <img src="/images/things2026/frame.jpeg" alt="real frame" style="flex: 1; min-width: 0; width: 50%; max-width: 100%; max-height: 450px; object-fit: contain;" />
 </div>
 
-The big challenge here was being limited to a ~`24x12`" nominal workspace on an Epilog laser, while the frame itself is `25x19`". Since the frame dimensions exceed the workspace, I included some dovetails/joinery to assemble the backing and mat.
-
+The big challenge here was being limited to a ~`24x12`" nominal workspace on an Epilog laser cutter, while the frame itself is `25x19`". Since the frame dimensions exceed the workspace, I included some dovetails/joinery to assemble the backing and mat. Total part dimensions fit with just enough margin on the Epilog:
 ![packing in pieces](/images/things2026/layout.png)
 
 <!-- ![alignment](/images/things2026/alignment.jpg)
