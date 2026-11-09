@@ -8,7 +8,7 @@ tag: project
 
 ## Aluminum extrusion standing desk
 
-This year's splurge was a few hundred linear inches of aluminum extrusion. It supports a Ikea tabletop from the dumpster and is bolted on top of a pair of beefy electric standing desk legs:
+This year's splurge was a few hundred linear inches of aluminum extrusion. The frame supports an Ikea tabletop from the dumpster and is bolted on top of a pair of beefy electric standing desk legs:
 
 ![desk](/images/things2026/desk.jpeg)
 
@@ -16,7 +16,7 @@ This year's splurge was a few hundred linear inches of aluminum extrusion. It su
 
 ## Neon picture frame
 
-In addition to good coffee, Work in Progress cafe in Costa Mesa, CA sells prints. My best friend Cesar pointed out that he'd bought one of these prints, but was missing the big ~`25x19`" neon acrylic frame that accompanies it:
+In addition to good coffee, [Work in Progress cafe in Costa Mesa, CA](https://share.google/aEPfKDhHEKlDHQb9S) sells prints. My best friend Cesar mentioned that he'd bought one of these prints, but didn't have the big ~`25x19`" neon acrylic frame that accompanies it:
 
 ![reference frame](/images/things2026/reference.jpeg)
 
