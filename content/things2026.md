@@ -20,14 +20,16 @@ In addition to good coffee, [Work in Progress cafe in Costa Mesa, CA](https://sh
 
 ![reference frame](/images/things2026/reference.jpeg)
 
-I know a little bit about fabricating with acrylic plastic, so we made him one:
+So I on the flight to NYC I CAD'd it up. I know a little bit about fabricating with acrylic plastic, so I tried to replicate the original feel as closely as possible out of `1/4"` neon green acrylic. The backing and mat are made of birch plywood, and the mat/poster snap to the frame with little neodymium magnets.
 
 <div style="display: flex; gap: 16px; justify-content: center; align-items: center; margin: 2rem 0;">
   <img src="/images/things2026/cad.png" alt="CAD" style="flex: 1; min-width: 0; width: 50%; max-width: 100%; max-height: 450px; object-fit: contain;" />
   <img src="/images/things2026/frame.jpeg" alt="real frame" style="flex: 1; min-width: 0; width: 50%; max-width: 100%; max-height: 450px; object-fit: contain;" />
 </div>
 
-The big challenge here was being limited to a ~`24x12`" nominal workspace on an Epilog laser, while the frame itself is `25x19`". Since the frame dimensions exceed the workspace, we had to design in some dovetails/joinery to assemble the backing and mat. The mat and poster snap to the frame with little neodymium magnets.
+The big challenge here was being limited to a ~`24x12`" nominal workspace on an Epilog laser, while the frame itself is `25x19`". Since the frame dimensions exceed the workspace, I included some dovetails/joinery to assemble the backing and mat.
+
+![packing in pieces](/images/things2026/layout.png)
 
 <!-- ![alignment](/images/things2026/alignment.jpg)
 ![construction](/images/things2026/construction.jpg) -->
