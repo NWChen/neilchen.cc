@@ -21,70 +21,57 @@ export default function Home({ posts, blurb }: { posts: PostProps[], blurb: stri
   const { mode, toggleColorMode } = useColorMode();
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+    <Container maxWidth="md" sx={{ mt: 1, position: "relative" }}>
+      <Box sx={{ position: "absolute", top: 0, right: 16 }}>
         <IconButton onClick={toggleColorMode} aria-label="Toggle dark mode">
           {mode === "dark" ? <LightMode /> : <DarkMode />}
         </IconButton>
       </Box>
-      <Box
+      <Box sx={{ mt: 3, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <img
+          src="/profile.png"
+          style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover" }}
+        />
+        <Typography variant="h1" sx={{ fontSize: "1.35rem !important" }}>
+          Neil Chen
+        </Typography>
+      </Box>
+      <Box sx={{ ml: -1, mt: 0.5 }}>
+        <Button size="small" variant="text" color="primary" href="/blog">
+          Blog
+        </Button>
+        <Button size="small" variant="text" color="primary" href="mailto:neilwchen@gmail.com">
+          Contact
+        </Button>
+        <Button size="small" variant="text" color="primary" href="https://github.com/nwchen">
+          GitHub
+        </Button>
+        <Button size="small" variant="text" color="primary" href="https://www.linkedin.com/in/neilwchen/">
+          LinkedIn
+        </Button>
+        <Button size="small" variant="text" color="primary" href="https://www.strava.com/athletes/66448483">
+          Strava
+        </Button>
+      </Box>
+      <Typography
+        component="div"
+        variant="body2"
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          gap: 4,
-          alignItems: "flex-start",
+          fontSize: "0.95rem !important",
+          "& p": { my: 0.5 },
+          "& p, & li": { lineHeight: 1.35 },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Typography variant="h1" sx={{ alignSelf: "flex-start" }}>
-            Neil Chen
-          </Typography>
-          <Box>
-            <Button variant="text" color="primary" href="/blog">
-              Blog
-            </Button>
-            {/* <Button variant="text" color="primary" href="/bakes">
-              Jessie's Bakes
-            </Button> */}
-            <Button variant="text" color="primary" href="mailto:neilwchen@gmail.com">
-              Contact
-            </Button>
-            <Button variant="text" color="primary" href="https://github.com/nwchen">
-              GitHub
-            </Button>
-            <Button variant="text" color="primary" href="https://www.linkedin.com/in/neilwchen/">
-              LinkedIn
-            </Button>
-            <Button variant="text" color="primary" href="https://www.strava.com/athletes/66448483">
-              Strava 
-            </Button>
-          </Box>
-          <Box>
-            <Typography component="span" variant="body1">
-              <div dangerouslySetInnerHTML={{ __html: marked(blurb) }} />
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ order: { xs: -1, sm: 0 } }}>
-          <img
-            src="/profile.png"
-            style={{
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
-          />
-        </Box>
-      </Box>
-      <Divider sx={{ my: 2 }} />
+        <div dangerouslySetInnerHTML={{ __html: marked(blurb) }} />
+      </Typography>
+      <Divider sx={{ my: 1.5 }} />
       <Box>
-        <Typography variant="h2">Projects</Typography>
+        <Typography variant="h2" sx={{ fontSize: "1.5rem !important", mb: 0.5 }}>Projects</Typography>
         <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Project)} />
       </Box>
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ my: 1.5 }} />
       <Box>
-        <Typography variant="h2">Notes</Typography>
+        <Typography variant="h2" sx={{ fontSize: "1.5rem !important", mb: 0.5 }}>Notes</Typography>
         <Posts posts={posts.filter((post) => post.metadata?.tag == Tag.Note)} />
       </Box>
     </Container>
