@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Container, Divider, Fade, Grid, IconButton, ListItem, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Container, Divider, Fade, Grid, IconButton, ListItem, Stack, TextField, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React, { useRef, useEffect, useState } from "react";
 import Globe, { GlobeMethods } from "react-globe.gl";
 import Header from "../../components/Header";
@@ -9,10 +9,6 @@ const getRandomElement = (arr: any[]) => arr[Math.floor(Math.random() * arr.leng
 // TODO: get flyto transition animation to work
 const FLYTO_TRANSITION_MS = 0;
 
-// Container constants
-const CONTAINER_BACKGROUND_COLOR = 'white';
-const CONTAINER_WIDTH = '50%';
-const CONTAINER_HEIGHT = '50%';
 
 // Label constants
 const LABEL_COLOR = 'white';
@@ -127,7 +123,7 @@ const getBestCity = (startCity: Feature, cities: Feature[]) => {
   return bestCity;
 }
 
-const formatResults = (startCity: Feature, endCity: Feature, results: Score) => {
+const formatResults = (startCity: Feature, endCity: Feature, results: Score, dark: boolean) => {
   if (!startCity || !endCity || !results) return;
 
   const absScore = {
@@ -140,13 +136,13 @@ const formatResults = (startCity: Feature, endCity: Feature, results: Score) => 
       <Typography><b>{startCity.name}</b> is:</Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 2}>
-      <Typography variant='h3'>
-        {absScore.latDeltaMiles} miles <span style={{ color: 'red' }}>(north-south)</span>
+      <Typography variant='h3' sx={{ fontSize: { xs: '1.75rem', md: '3rem' } }}>
+        {absScore.latDeltaMiles} miles <span style={{ color: dark ? '#ff6b6b' : 'red' }}>(north-south)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 3}>
-      <Typography variant='h3'>
-        {absScore.lngDeltaMiles} miles <span style={{ color: 'blue' }}>(east-west)</span>
+      <Typography variant='h3' sx={{ fontSize: { xs: '1.75rem', md: '3rem' } }}>
+        {absScore.lngDeltaMiles} miles <span style={{ color: dark ? '#6ea8ff' : 'blue' }}>(east-west)</span>
       </Typography>
     </Fade>
     <Fade in timeout={TIMEOUT * 4}><Typography>from <b>{endCity.name}</b> (your guess).</Typography></Fade>
@@ -211,6 +207,26 @@ export default function Game() {
   const [bestCity, setBestCity] = useState<any>();
   const [paths, setPaths] = useState<any>();
   const [results, setResults] = useState<Score>();
+
+  const theme = useTheme();
+  const dark = theme.palette.mode === 'dark';
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Size the globe to its container so it resizes with the viewport.
+  const globeContainerRef = useRef<HTMLDivElement>(null);
+  const [globeWidth, setGlobeWidth] = useState(0);
+  useEffect(() => {
+    const el = globeContainerRef.current;
+    if (!el) return;
+    const update = () => setGlobeWidth(el.clientWidth);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const globeHeight = isMobile
+    ? Math.min(Math.max(globeWidth, 280), 480)
+    : Math.min(Math.max(globeWidth * 0.6, 400), 700);
 
   // Initialize Globe when window is ready.
   let Globe = () => null;
@@ -314,7 +330,7 @@ export default function Game() {
         <Grid size={12} sx={{ paddingBottom: '24px' }}>
           <Divider />
         </Grid>
-        <Grid size={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Stack spacing={2}>
             <Typography>Guess a city closest to the latitude of <b>{startCity?.name}</b>.</Typography>
             <Typography variant='subtitle2'>(Bonus points if your guess is <i>further</i> in the east-west direction).</Typography>
@@ -329,7 +345,7 @@ export default function Game() {
               }
               sx={{
                 zIndex: 10,
-                background: 'white'
+                background: theme.palette.background.paper
               }}
               renderOption={(props, option) => {
                 return (
@@ -346,14 +362,14 @@ export default function Game() {
             />}
           </Stack>
         </Grid>
-        <Grid size={3}>
-          {results && formatResults(startCity, endCity, results)}
+        <Grid size={{ xs: 12, md: 3 }}>
+          {results && formatResults(startCity, endCity, results, dark)}
         </Grid>
-        <Grid size={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           {startCity && endCity &&
             <Fade in timeout={TIMEOUT * 5}>
               <Box>
-                <Typography display='inline' variant='h3'>
+                <Typography display='inline' variant='h3' sx={{ fontSize: { xs: '1.75rem', md: '3rem' } }}>
                   Your score: <span style={{ color: scoreColor }}><b>{score}%</b></span>
                 </Typography>
                 <IconButton size='small'>
@@ -383,7 +399,7 @@ export default function Game() {
             </Fade>
           }
         </Grid>
-        <Grid size={2} display='flex' justifyContent='flex-end'>
+        <Grid size={{ xs: 12, md: 2 }} display='flex' justifyContent='flex-end'>
           <Button
             variant='contained'
             color='primary'
@@ -395,16 +411,17 @@ export default function Game() {
             <Typography>Start over</Typography>
           </Button>
         </Grid>
-        <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-          {cities.length > 0 && currentCity !== undefined && <Globe
+        <Grid size={12} sx={{ display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+          <Box ref={globeContainerRef} sx={{ width: '100%', minHeight: globeHeight }}>
+          {globeWidth > 0 && cities.length > 0 && currentCity !== undefined && <Globe
             ref={globeMethods}
-            width={CONTAINER_WIDTH}
-            height={CONTAINER_HEIGHT}
-            backgroundColor={CONTAINER_BACKGROUND_COLOR}
+            width={globeWidth}
+            height={globeHeight}
+            backgroundColor={theme.palette.background.default}
 
             // TODO: hard mode, dont show image tiles until answer
             globeImageUrl='https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'
-            globeOffset={[0, -100]}
+            globeOffset={[0, isMobile ? 0 : -100]}
             onGlobeReady={() =>
               flyTo(
                 currentCity.lat,
@@ -436,6 +453,7 @@ export default function Game() {
 
             showGraticules={endCity !== undefined}
           />}
+          </Box>
         </Grid>
       </Grid>
     </>
