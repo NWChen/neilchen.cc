@@ -325,7 +325,8 @@ export default function Game() {
         container
         maxWidth='lg'
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{ margin: '0 auto' }}
+        rowSpacing={{ xs: 3, md: 0 }}
+        sx={{ margin: '0 auto', px: { xs: 2, md: 0 }, boxSizing: 'border-box' }}
       >
         <Grid size={12} sx={{ paddingBottom: '24px' }}>
           <Divider />
@@ -379,7 +380,7 @@ export default function Game() {
                 </IconButton>
 
                 <Typography>
-                  Another option would have been
+                  Another option would have been{' '}
                   <Button variant='text' color='success' onClick={() => setCurrentCity(bestCity.feature)}
                     sx={{
                       padding: 0,
